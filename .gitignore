@@ -3,3 +3,6 @@
 
 # Exclude build files for now
 build/*
+
+# Exclude data files
+data/*
