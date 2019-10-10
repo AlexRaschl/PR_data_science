@@ -1,2 +1,5 @@
 # Pycharm conf
 .idea/
+
+# Exclude build files for now
+build/*
