@@ -20,6 +20,7 @@ setuptools.setup(
         'matplotlib',
         'numpy',
         'tensorflow',
+        'google-api-python-client'
 
     ]
 )
