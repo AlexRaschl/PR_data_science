@@ -6,3 +6,6 @@ build/*
 
 # Exclude data files
 data/*
+
+# Exclude cached files
+cache/*
