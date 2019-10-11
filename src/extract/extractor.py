@@ -1,31 +1,8 @@
 import json
 
-import scrapy as scrapy
 from googleapiclient.discovery import build
 
-from src.config import API_KEY, YT_WATCH_STUB, YT_SEARCH_STUB, CACHE_PATH
-from src.extract.lfm_loader import Loader
-
-
-class MusicVideoCrawler(scrapy.Spider):
-    name = 'videos'
-
-    def __init__(self, lfm_generator, **kwargs):
-        super().__init__(**kwargs)
-        self.lfm_generator = lfm_generator
-
-    def start_requests(self):
-        print('hello')
-        for item in self.lfm_generator:
-            print(self.__generate_search_link(item))
-            yield scrapy.Request(url=self.__generate_search_link(item), callback=self.parse)
-
-    def parse(self, response):
-        return response
-
-    @staticmethod
-    def __generate_search_link(lfm_data: dict) -> str:
-        return f'{YT_SEARCH_STUB}{lfm_data["song_name"]} Official Video'.replace(' ', '%20')
+from src.config import API_KEY, YT_WATCH_STUB
 
 
 class YT_API_Crawler:
@@ -72,6 +49,7 @@ class YT_API_Crawler:
         # TODO: Soft hint -> video in title
         # TODO: Soft hint -> creator name in channel name
         # TODO: Soft hint -> Official music video in description
+        # TODO: Hard fact -> Cover not in title
 
         return True
 
@@ -109,11 +87,6 @@ class YT_API_Crawler:
         return item
 
 
-# def __stringify_statistics(statistics: dict):
-#     return {
-#
-#     }
-
 def test_YT_Crawler():
     c = YT_API_Crawler()
     r = c.search_for_music_video(
@@ -126,13 +99,7 @@ def test_YT_Crawler():
     print(json.dumps(r, indent=2))
 
 
-def test_MusicVideoCrawler():
-    loader = Loader(CACHE_PATH)
-    c = MusicVideoCrawler(loader.shuffled_list(4))
-    for i in c.start_requests():
-        print(i)
-
 
 if __name__ == '__main__':
+    pass
     # test_YT_Crawler()
-    test_MusicVideoCrawler()
