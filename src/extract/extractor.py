@@ -1,11 +1,34 @@
 import json
 
+import scrapy as scrapy
 from googleapiclient.discovery import build
 
-from src.config import API_KEY, YT_BASE_LINK
+from src.config import API_KEY, YT_WATCH_STUB, YT_SEARCH_STUB, CACHE_PATH
+from src.extract.lfm_loader import Loader
 
 
-class Crawler:
+class MusicVideoCrawler(scrapy.Spider):
+    name = 'videos'
+
+    def __init__(self, lfm_generator, **kwargs):
+        super().__init__(**kwargs)
+        self.lfm_generator = lfm_generator
+
+    def start_requests(self):
+        print('hello')
+        for item in self.lfm_generator:
+            print(self.__generate_search_link(item))
+            yield scrapy.Request(url=self.__generate_search_link(item), callback=self.parse)
+
+    def parse(self, response):
+        return response
+
+    @staticmethod
+    def __generate_search_link(lfm_data: dict) -> str:
+        return f'{YT_SEARCH_STUB}{lfm_data["song_name"]} Official Video'.replace(' ', '%20')
+
+
+class YT_API_Crawler:
 
     def __init__(self):
         self.yt_service = build('youtube', 'v3', developerKey=API_KEY)
@@ -58,7 +81,8 @@ class Crawler:
         statistics = self.yt_service.videos().list(id=v_id, part='statistics').execute()['items'][0]['statistics']
         return item, statistics
 
-    def construct_json_dict(self, item: dict, statistics: dict, lfm_data: dict):
+    @staticmethod
+    def construct_json_dict(item: dict, statistics: dict, lfm_data: dict):
 
         if not item or not statistics or not lfm_data:
             raise ValueError('Cannot construct json-dict from None!')
@@ -79,7 +103,7 @@ class Crawler:
         except KeyError:
             print(f'Key not found: snippet.localized: {item}')
 
-        item['link'] = YT_BASE_LINK + item['id']
+        item['link'] = YT_WATCH_STUB + item['id']
         item['statistics'] = statistics
         item['lfm_data'] = lfm_data
         return item
@@ -90,8 +114,8 @@ class Crawler:
 #
 #     }
 
-if __name__ == '__main__':
-    c = Crawler()
+def test_YT_Crawler():
+    c = YT_API_Crawler()
     r = c.search_for_music_video(
         {
             'song_name': 'We Are Young (feat. Janelle Monáe)',
@@ -100,3 +124,15 @@ if __name__ == '__main__':
         }
     )
     print(json.dumps(r, indent=2))
+
+
+def test_MusicVideoCrawler():
+    loader = Loader(CACHE_PATH)
+    c = MusicVideoCrawler(loader.shuffled_list(4))
+    for i in c.start_requests():
+        print(i)
+
+
+if __name__ == '__main__':
+    # test_YT_Crawler()
+    test_MusicVideoCrawler()

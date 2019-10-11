@@ -34,10 +34,11 @@ class Loader:
             pd.to_pickle(self.data, self.data_path)
             return self.data
 
-    def next_shuffled_list_item(self):
+    def shuffled_list(self, n_items: int = 0):
         data = self.load_data()
+        size = data.shape[0] if n_items == 0 else n_items
 
-        for i in range(0, int(data.shape[0] / 2)):
+        for i in range(0, int(size / 2)):
             yield self.convert_to_dict(data.iloc[i])
             yield self.convert_to_dict(data.iloc[-i - 1])
 
@@ -53,6 +54,6 @@ class Loader:
 
 if __name__ == '__main__':
     loader = Loader(CACHE_PATH)
-    shuffler = loader.next_shuffled_list_item()
+    shuffler = loader.shuffled_list(10)
     for i in range(0, 10):
         print(f'{next(shuffler)}\n')
