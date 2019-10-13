@@ -2,7 +2,7 @@ import pymongo
 import scrapy
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 
-from src.config import YT_SEARCH_STUB, CACHE_PATH, YT_WATCH_STUB
+from src.config import *
 from src.extract.lfm_loader import Loader
 from src.scraping.scraping.items import VideoItem
 from src.scraping.scraping.util import VideoInspector
@@ -56,9 +56,9 @@ class SearchSpider(scrapy.Spider):
 
         return
 
-    def parse_watch_request(self, response):
-
-        pass
+    # def parse_watch_request(self, response):
+    #
+    #     pass
 
     @staticmethod
     def __generate_search_link(lfm_data: dict) -> str:
@@ -75,8 +75,8 @@ class SearchSpider(scrapy.Spider):
 
     def get_collection_from_db(self):
         conn = pymongo.MongoClient(
-            'localhost',
-            27017
+            DB_HOST,
+            DB_PORT
         )
-        db = conn['musicvideos']
-        return db['video_info']
+        db = conn[DB_NAME]
+        return db[DB_COLLECTION]

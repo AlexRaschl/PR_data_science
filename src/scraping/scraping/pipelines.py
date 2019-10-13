@@ -7,16 +7,18 @@
 
 import pymongo
 
+from src.config import DB_HOST, DB_COLLECTION, DB_PORT, DB_NAME
+
 
 class MongoDBPipeline(object):
 
     def __init__(self):
         self.conn = pymongo.MongoClient(
-            'localhost',
-            27017
+            DB_HOST,
+            DB_PORT
         )
-        db = self.conn['musicvideos']
-        self.collection = db['video_info']
+        db = self.conn[DB_NAME]
+        self.collection = db[DB_COLLECTION]
 
     def process_item(self, item, spider):
         # Ignore duplicates
