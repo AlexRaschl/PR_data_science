@@ -7,6 +7,7 @@ YT_SEARCH_STUB = r'https://www.youtube.com/results?search_query='
 
 
 CACHE_PATH = 'cache'
+EMPTY_PATH = 'NONE'
 
 N_LINKS_SEARCHED = 5
 
@@ -15,3 +16,4 @@ DB_HOST = 'localhost'
 DB_PORT = 27017
 DB_NAME = 'musicvideos'
 DB_COLLECTION = 'video_info'
+

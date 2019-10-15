@@ -15,10 +15,12 @@ class VideoItem(scrapy.Item):
     v_link = Field()
     v_title = Field()
     v_descr = Field()
-    v_likes = Field()
     v_views = Field()
-    v_dislikes = Field()
     v_filepath = Field()
+
+    #   v_likes = Field()
+    #   v_dislikes = Field()
+
 
     song_name = Field()
     creator = Field()
