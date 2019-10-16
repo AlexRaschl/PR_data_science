@@ -17,7 +17,7 @@ class SearchSpider(scrapy.Spider):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.lfm_generator = Loader(CACHE_PATH).shuffled_list(1000)
+        self.lfm_generator = Loader(CACHE_PATH).shuffled_list(5000)
         self.collection = self.get_collection_from_db()
 
     def start_requests(self):
@@ -36,6 +36,10 @@ class SearchSpider(scrapy.Spider):
         vid_a = response.selector.xpath(
             r'//li/div/div/div[contains(@class, yt-lockup-content)]/h3/a[contains(@href,"watch?v")]').get()
 
+        # Extract channel info
+        vid_channel = response.selector.xpath(
+            r'//li/div/div/div[contains(@class, yt-lockup-content)]/*/a[contains(@href, "/channel/") or contains(@href, "/user/")]/text()').get()
+
         # Extract meta <div> containing number of views
         vid_meta = response.selector.xpath(
             '//li/div/div/div[contains(@class, yt-lockup-content)]/div[contains(@class, yt-lockup-meta)]/ul').get()
@@ -45,7 +49,7 @@ class SearchSpider(scrapy.Spider):
             r'//li/div/div/div[contains(@class, yt-lockup-content)]/div[contains(@class,yt-lockup-description) and @dir="ltr"]').get()
 
         # Extract all the above
-        info = self.inspector.extract(vid_a, vid_descr, vid_meta)
+        info = self.inspector.extract(vid_a, vid_descr, vid_meta, vid_channel)
         # print(info)
 
         found = self.inspector.is_music_video(info, song_name, creator)
@@ -61,7 +65,7 @@ class SearchSpider(scrapy.Spider):
 
     @staticmethod
     def __generate_search_link(lfm_data: dict) -> str:
-        return f'{YT_SEARCH_STUB}{lfm_data["song_name"]} Official Video'.replace(' ', '%20')
+        return f'{YT_SEARCH_STUB}{lfm_data["creator"]} - {lfm_data["song_name"]} Official Video'.replace(' ', '%20')
 
     @staticmethod
     def __generate_watch_link(v_id: str):
@@ -71,7 +75,8 @@ class SearchSpider(scrapy.Spider):
     def __generate_item(found, info, song_name, creator, listening_events):
         return VideoItem(v_id=info['v_id'], v_found=found, v_link=YT_WATCH_STUB + info['v_id'],
                          v_title=info['title'],
-                         v_descr=info['descr'], v_views=info['views'], v_filepath=EMPTY_PATH, song_name=song_name,
+                         v_descr=info['descr'], v_views=info['views'], v_filepath=EMPTY_PATH, v_channel=info['channel'],
+                         song_name=song_name,
                          creator=creator,
                          listening_events=listening_events)
 

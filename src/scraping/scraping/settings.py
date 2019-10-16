@@ -8,6 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+from scrapy.settings.default_settings import USER_AGENT
 
 BOT_NAME = 'scraping'
 
@@ -15,7 +16,8 @@ SPIDER_MODULES = ['src.scraping.scraping.spiders']
 NEWSPIDER_MODULE = 'src.scraping.scraping.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'scraping (+http://www.yourdomain.com)'
+# USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36'
+print(USER_AGENT)
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False

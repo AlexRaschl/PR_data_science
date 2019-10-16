@@ -18,7 +18,7 @@ class VideoInspector:
     directed_by_regex = re.compile(r'directed[\s-]*by', re.IGNORECASE)
     full_video_regex = re.compile(r'full[/a-z<>\s]*vid(eo)?')
 
-    def extract(self, vid_a, vid_descr, vid_meta) -> dict:
+    def extract(self, vid_a, vid_descr, vid_meta, vid_channel) -> dict:
         try:
             v_id = self.v_id_regex.search(vid_a).group(1)
             title = self.title_regex.search(vid_a).group(1)
@@ -30,12 +30,14 @@ class VideoInspector:
                 print(f'title={title}\n')
                 print(f'descr={descr}\n')
                 print(f'views={views}\n')
+                print(f'channel={vid_channel}\n')
 
             return {
                 'v_id': v_id,
                 'title': title,
                 'descr': descr,
-                'views': views
+                'views': views,
+                'channel': vid_channel
             }
         except Exception as e:
             traceback.print_exc()
@@ -60,9 +62,15 @@ class VideoInspector:
 
         title = video_info['title']
         descr = video_info['descr']
+        channel = video_info['channel']
+
         # Hard fact -> Cover not in title
         if 'cover' in title.lower() or 'lyric' in title.lower():
             print(f'Title: {title} : contains cover or lyrics! ')
+            return False
+
+        if creator.lower() not in title.lower() and creator.lower() not in channel.lower():
+            print(f'Creator not in channel nor in title: {creator}')
             return False
 
         m = self.official_vid_regex.search(title)

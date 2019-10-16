@@ -17,6 +17,7 @@ class VideoItem(scrapy.Item):
     v_descr = Field()
     v_views = Field()
     v_filepath = Field()
+    v_channel = Field()
 
     #   v_likes = Field()
     #   v_dislikes = Field()
