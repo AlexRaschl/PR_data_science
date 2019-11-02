@@ -8,6 +8,7 @@ YT_SEARCH_STUB = r'https://www.youtube.com/results?search_query='
 
 CACHE_PATH = 'cache'
 EMPTY_PATH = 'NONE'
+FAIL_PATH = 'FAILED'
 
 # N_LINKS_SEARCHED = 5
 
