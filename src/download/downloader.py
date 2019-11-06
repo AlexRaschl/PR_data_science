@@ -77,6 +77,7 @@ class Downloader:
                     self.collection.update_one({'v_id': extract_id(fname)},
                                                {"$set": {
                                                    'v_filepath': fname.replace(DL_PATH, ''),
+                                                   'v_descr': info['description'],
                                                    'v_res': RES_regex.search(fname).group(1),
                                                    'v_width': RES_regex.search(fname).group(2),
                                                    'v_height': RES_regex.search(fname).group(3),
