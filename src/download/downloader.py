@@ -55,15 +55,6 @@ class Downloader:
                     print(type(de), file=f)
                     print('\n\n', file=f)
 
-        # doc = self.collection.find_one({"$and": [{'v_found': dl_only_mv}, {'v_filepath': {"$eq": EMPTY_PATH}}]})
-        # try:
-        #     self.ydl.download([doc['v_link']])
-        # except DownloadError as de:
-        #     print(de)
-        #     with open('dl_error.log', 'a') as f:
-        #         print('Could not download video. Required resolution not available!!', file=f) # TODO maybe mark this in database
-        #         print(doc['v_id'], file=f)
-        #         print('\n\n', file=f)
 
     def dl_hook(self, d):
         print(d)
