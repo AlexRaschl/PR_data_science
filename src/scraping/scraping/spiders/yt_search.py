@@ -1,8 +1,8 @@
+import pymongo
 import scrapy
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 
 from src.config import *
-from src.database.db_utils import get_collection_from_db
 from src.extract.lfm_loader import Loader
 from src.scraping.scraping.items import VideoItem
 from src.scraping.scraping.util import VideoInspector
@@ -18,7 +18,7 @@ class SearchSpider(scrapy.Spider):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.lfm_generator = Loader(CACHE_PATH).shuffled_list(5000)
-        self.collection = get_collection_from_db()
+        self.collection = self.get_collection_from_db()
 
     def start_requests(self):
         for item in self.lfm_generator:
@@ -79,3 +79,12 @@ class SearchSpider(scrapy.Spider):
                          song_name=song_name,
                          creator=creator,
                          listening_events=listening_events)
+
+    @staticmethod
+    def get_collection_from_db():
+        conn = pymongo.MongoClient(
+            DB_HOST,
+            DB_PORT
+        )
+        db = conn[DB_NAME]
+        return db[DB_COLLECTION]
