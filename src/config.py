@@ -8,6 +8,7 @@ YT_SEARCH_STUB = r'https://www.youtube.com/results?search_query='
 
 CACHE_PATH = 'cache'
 EMPTY_PATH = 'NONE'
+FAIL_PATH = 'FAILED'
 
 # N_LINKS_SEARCHED = 5
 
@@ -15,4 +16,9 @@ EMPTY_PATH = 'NONE'
 DB_HOST = 'localhost'
 DB_PORT = 27017
 DB_NAME = 'musicvideos'
-DB_COLLECTION = 'yt_videos'
+DB_COLLECTION = 'video_info'  # TODO CHANGE BACK TO yt_videos after dl tested
+
+# Download Configs
+DL_DELAY = 10
+DL_PATH = "H:\\Datasets\\YouTube\\"
+JSON_INFO_EXTENSION = '.info.json'
