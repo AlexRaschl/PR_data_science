@@ -88,7 +88,6 @@ def extract_id(filepath):
     return ID_regex.search(filepath).group(1)
 
 
-# Use if f.e Internet connection had a time out.
 def reset_failed():
     collection = get_collection_from_db()
     collection.update_many({'v_filepath': FAIL_PATH}, {'$set': {'v_filepath': EMPTY_PATH}})
