@@ -5,13 +5,20 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
-from src.database.db_utils import get_collection_from_db
+import pymongo
+
+from src.config import DB_HOST, DB_COLLECTION, DB_PORT, DB_NAME
 
 
 class MongoDBPipeline(object):
 
     def __init__(self):
-        self.collection = get_collection_from_db()
+        self.conn = pymongo.MongoClient(
+            DB_HOST,
+            DB_PORT
+        )
+        db = self.conn[DB_NAME]
+        self.collection = db[DB_COLLECTION]
 
     def process_item(self, item, spider):
         # Ignore duplicates
