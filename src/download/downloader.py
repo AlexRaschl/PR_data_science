@@ -8,7 +8,7 @@ from src.config import EMPTY_PATH, DL_PATH, JSON_INFO_EXTENSION, DL_DELAY, FAIL_
 from src.database.db_utils import get_collection_from_db
 
 ID_regex = re.compile(r'H:\\Datasets\\YouTube\\([A-Za-z0-9_\-]{11})-')
-RES_regex = re.compile(r'([0-9]*x[0-9]* \([0-9]*p\))')
+RES_regex = re.compile(r'(([0-9]*)x([0-9]*) \([0-9]*p\))')
 EXT_matcher = re.compile(r'(.[A-Za-z0-9]*$)')
 
 
@@ -28,7 +28,7 @@ class Downloader:
             'call_home': False,
             'sleep_interval': DL_DELAY,
             'progress_hooks': [self.dl_hook],
-            'format': 'best[height<=360]'  # Download in 360p or lower
+            'format': 'best[height<=360][width<=640]'  # Download in 360p or lower
         }
         self.ydl = YoutubeDL(self.options)
 
@@ -78,6 +78,8 @@ class Downloader:
                                                {"$set": {
                                                    'v_filepath': fname.replace(DL_PATH, ''),
                                                    'v_res': RES_regex.search(fname).group(1),
+                                                   'v_width': RES_regex.search(fname).group(2),
+                                                   'v_height': RES_regex.search(fname).group(3),
                                                    'v_likes': info['like_count'],
                                                    'v_dislikes': info['dislike_count'],
                                                    'v_avg_rating': info['average_rating']
