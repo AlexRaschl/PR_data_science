@@ -80,6 +80,7 @@ class Downloader:
                                                    'v_res': RES_regex.search(fname).group(1),
                                                    'v_width': RES_regex.search(fname).group(2),
                                                    'v_height': RES_regex.search(fname).group(3),
+                                                   'v_duration': info['duration'],
                                                    'v_likes': info['like_count'],
                                                    'v_dislikes': info['dislike_count'],
                                                    'v_avg_rating': info['average_rating']
