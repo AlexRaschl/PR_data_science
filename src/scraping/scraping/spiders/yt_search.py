@@ -17,7 +17,7 @@ class SearchSpider(scrapy.Spider):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.lfm_generator = Loader(CACHE_PATH).shuffled_list(5000)
+        self.lfm_generator = Loader(CACHE_PATH).shuffled_list(N_CRAWLS)
         self.collection = get_collection_from_db()
 
     def start_requests(self):

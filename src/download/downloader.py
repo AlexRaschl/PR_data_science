@@ -7,7 +7,8 @@ from youtube_dl.utils import DownloadError
 from src.config import EMPTY_PATH, DL_PATH, JSON_INFO_EXTENSION, DL_DELAY, FAIL_PATH
 from src.database.db_utils import get_collection_from_db
 
-ID_regex = re.compile(r'H:\\Datasets\\YouTube\\([A-Za-z0-9_\-]{11})-')
+# ID_regex = re.compile(r'H:\\Datasets\\YouTube\\([A-Za-z0-9_\-]{11})-')
+ID_regex = re.compile(r'([A-Za-z0-9_\-]{11})-')
 RES_regex = re.compile(r'(([0-9]*)x([0-9]*) \([0-9]*p\))')
 EXT_matcher = re.compile(r'(.[A-Za-z0-9]*$)')
 
