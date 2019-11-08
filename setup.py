@@ -20,7 +20,9 @@ setuptools.setup(
         'matplotlib',
         'numpy',
         'tensorflow',
-        'google-api-python-client'
+        'google-api-python-client',
+        'scikit-image',
+        'scrapy'
 
     ]
 )

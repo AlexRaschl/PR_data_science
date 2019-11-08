@@ -78,4 +78,4 @@ class SearchSpider(scrapy.Spider):
                          v_descr=info['descr'], v_views=info['views'], v_filepath=EMPTY_PATH, v_channel=info['channel'],
                          song_name=song_name,
                          creator=creator,
-                         listening_events=listening_events)
+                         listening_events=int(listening_events))

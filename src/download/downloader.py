@@ -4,7 +4,7 @@ import re
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
 
-from src.config import EMPTY_PATH, DL_PATH, JSON_INFO_EXTENSION, DL_DELAY, FAIL_PATH
+from src.config import EMPTY_PATH, DL_PATH, JSON_INFO_EXTENSION, DL_DELAY, FAIL_PATH, N_CRAWLS
 from src.database.db_utils import get_collection_from_db
 
 # ID_regex = re.compile(r'H:\\Datasets\\YouTube\\([A-Za-z0-9_\-]{11})-')
@@ -33,7 +33,7 @@ class Downloader:
         }
         self.ydl = YoutubeDL(self.options)
 
-    def download(self, num=1000, dl_only_mv=True):
+    def download(self, num=N_CRAWLS, dl_only_mv=True):
         # Find entries which have not been downloaded yet
 
         for i in range(num):
@@ -55,6 +55,9 @@ class Downloader:
                     print(de, file=f)
                     print(type(de), file=f)
                     print('\n\n', file=f)
+            except TypeError as te:
+                print("No more videos left to download!")
+                return
 
     def dl_hook(self, d):
         print(d)
@@ -70,8 +73,8 @@ class Downloader:
                                                    'v_filepath': fname.replace(DL_PATH, ''),
                                                    'v_descr': info['description'],
                                                    'v_res': RES_regex.search(fname).group(1),
-                                                   'v_width': RES_regex.search(fname).group(2),
-                                                   'v_height': RES_regex.search(fname).group(3),
+                                                   'v_width': int(RES_regex.search(fname).group(2)),
+                                                   'v_height': int(RES_regex.search(fname).group(3)),
                                                    'v_duration': info['duration'],
                                                    'v_likes': info['like_count'],
                                                    'v_dislikes': info['dislike_count'],

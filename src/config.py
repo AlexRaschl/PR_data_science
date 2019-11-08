@@ -16,14 +16,14 @@ FAIL_PATH = 'FAILED'
 DB_HOST = 'localhost'
 DB_PORT = 27017
 DB_NAME = 'musicvideos'
-DB_COLLECTION = 'yt_test'  # TODO CHANGE BACK TO yt_videos after dl tested
+DB_COLLECTION = 'yt_final'
 
 # Crawl Configs
-N_CRAWLS = 100
+N_CRAWLS = 500
 
 # Download Configs
 DL_DELAY = 10
-DL_PATH = "H:\\Datasets\\YouTubeVideos\\"
+DL_PATH = "H:\\Datasets\\YouTubeFinal\\"
 JSON_INFO_EXTENSION = '.info.json'
 
 # Preprocessing configs

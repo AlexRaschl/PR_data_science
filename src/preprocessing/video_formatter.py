@@ -4,7 +4,7 @@ import cv2
 from ffmpy import FFmpeg
 from skimage.measure._structural_similarity import structural_similarity as ssim
 
-from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES
+from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES, N_CRAWLS
 from src.config import FFMPEG_PATH
 from src.database.db_utils import get_collection_from_db
 
@@ -182,4 +182,4 @@ class VideoSampler:
 
 if __name__ == '__main__':
     vm = VideoSampler()
-    vm.sample(n_vids=100)
+    vm.sample(n_vids=N_CRAWLS)

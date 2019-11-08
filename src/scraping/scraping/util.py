@@ -36,7 +36,7 @@ class VideoInspector:
                 'v_id': v_id,
                 'title': title,
                 'descr': descr,
-                'views': views,
+                'views': int(views),
                 'channel': vid_channel
             }
         except Exception as e:
@@ -90,6 +90,7 @@ class VideoInspector:
             print(f'Directed by regex matched: {descr}')
             return True
 
+        # Produces high amount of false positives but the VideoSampler will correct their label if needed
         exact_match_regex = re.compile(f'{creator} - {song_name}', re.IGNORECASE)
         if exact_match_regex.match(title):
             print(f'Exact Match Regex matched: {title}')
