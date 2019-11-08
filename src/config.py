@@ -29,3 +29,7 @@ JSON_INFO_EXTENSION = '.info.json'
 # Preprocessing configs
 RES_RSCLD = (480, 360)
 FFMPEG_PATH = "H:\Anwendungen\\ffmpeg\\bin\\ffmpeg.exe"
+
+N_SAMPLES = 15
+SAMPLE_OFFSET = 10
+SIMILARITY_THRES = 0.95
