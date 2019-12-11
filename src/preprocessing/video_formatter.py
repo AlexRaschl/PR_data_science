@@ -4,7 +4,7 @@ import cv2
 from ffmpy import FFmpeg
 from skimage.measure._structural_similarity import structural_similarity as ssim
 
-from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES, N_CRAWLS
+from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES, N_CRAWLS, FAIL_PATH
 from src.config import FFMPEG_PATH
 from src.database.db_utils import get_collection_from_db
 
@@ -102,6 +102,7 @@ class VideoSampler:
             vid = self.collection.find_one({"$and": [
                 {'v_found': True},
                 {'v_filepath': {"$ne": EMPTY_PATH}},
+                {'v_filepath': {"$ne": FAIL_PATH}},
                 {'sampled': {"$ne": True}},
             ]})
 
@@ -176,7 +177,7 @@ class VideoSampler:
 
     def check_equal(self, old_frame, frame):
         diff = ssim(old_frame, frame, data_range=frame.max() - frame.min(), multichannel=True)
-        print(diff)
+        # print(diff)
         return diff > SIMILARITY_THRES
 
 
