@@ -19,7 +19,7 @@ DB_NAME = 'musicvideos'
 DB_COLLECTION = 'yt_final'
 
 # Crawl Configs
-N_CRAWLS = 500
+N_CRAWLS = 5000
 
 # Download Configs
 DL_DELAY = 10
@@ -30,6 +30,6 @@ JSON_INFO_EXTENSION = '.info.json'
 RES_RSCLD = (480, 360)
 FFMPEG_PATH = "H:\Anwendungen\\ffmpeg\\bin\\ffmpeg.exe"
 
-N_SAMPLES = 15
+N_SAMPLES = 30
 SAMPLE_OFFSET = 10
 SIMILARITY_THRES = 0.95
