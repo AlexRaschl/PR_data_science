@@ -18,7 +18,7 @@ class Indexer:
         @param folder_name: Optionally write dataframe to file
         @param test_size: Proportion of test set size
         """
-        samples = list(self.collection.find(filter={'sampled': True}))
+        samples = list(self.collection.find(filter={'sampled': True, 'v_found': True}))
         X = pd.DataFrame(list([(s["v_id"], s['n_samples']) for s in samples]))
         y = pd.DataFrame(list([s["v_views"] for s in samples]))
 

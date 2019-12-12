@@ -135,7 +135,7 @@ class VideoSampler:
 
             old_frame = None
             equality_count = count = 0
-            for i in range(n_frames - n_frames % n_samples):
+            for i in range(n_frames):  # TODO ? - n_frames % n_samples):
                 ret, frame = cap.read()
 
                 if not ret:
