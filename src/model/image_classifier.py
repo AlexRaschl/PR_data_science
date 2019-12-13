@@ -1,3 +1,5 @@
+import os
+from itertools import product
 from os import listdir
 from os.path import join, isfile
 
@@ -8,8 +10,10 @@ from tensorflow.keras import Input
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from src.config import DL_PATH, N_SAMPLES
+from src.config import DL_PATH, N_SAMPLES, STORED_PRED_PATH, TRAIN_SIZE, TEST_SIZE
+from src.model.cfw import write_to_file
 from src.preprocessing.indexer import Indexer
+from src.preprocessing.wrappers import FramePredictions
 
 
 class ImageClassifier:
@@ -26,31 +30,38 @@ class ImageClassifier:
             self.model = VGG16(weights='imagenet')
 
     def classify(self, X):
-        y_pred = pd.DataFrame(X.iloc[:, 0])
-        y_pred.columns = ['v_id']
-        y_pred.set_index('v_id', inplace=True)
-        predictions = np.empty(shape=(y_pred.shape[0], self.batch_size),
+
+        predictions = np.empty(shape=(X.shape[0], self.batch_size),
                                dtype=np.dtype([
                                    ('predictions', np.int64, (self.n_predictions,)),
                                    ('probabilities', np.float64, (self.n_predictions,))]))
 
-        for i in range(self.batch_size):
-            y_pred['predictions_%d' % i] = None
-
-        for v_id in X.iloc[:, 0]:
+        for idx, v_id in enumerate(X.iloc[:, 0]):
             batch = self.load_batch(v_id)
             res = self.model.predict(batch, batch_size=self.batch_size)
-            i = 0
-            v_idx = y_pred.index.get_loc(v_id)
             labels = np.argsort(res, axis=-1)[:, -self.n_predictions - 1:-1]
             labels = labels[:, ::-1]
             probabilities = np.empty(shape=(30, 5), dtype=np.float64)
-            for i in range(30):
+            print(f'Prediction step: {idx}')
+            for i in range(labels.shape[0]):
                 probabilities = res[i, labels[i]]
 
-            predictions[v_idx, :]['predictions'] = labels
-            predictions[v_idx, :]['probabilities'] = probabilities
-        return predictions
+            predictions[idx, :labels.shape[0]]['predictions'] = labels
+            predictions[idx, :labels.shape[0]]['probabilities'] = probabilities
+
+        wrappers = []
+
+        for i, (r, c) in enumerate(product(range(X.shape[0]), range(self.batch_size))):
+            wrappers.append(FramePredictions(
+                predictions[r, c]['predictions'],
+                predictions[r, c]['probabilities']
+            ))
+        wrappers = np.asarray(wrappers, dtype=type(FramePredictions)).reshape(X.shape[0], self.batch_size)
+
+        df = pd.DataFrame(wrappers).set_index(pd.Index(X.iloc[:, 0]))
+        df.columns = [f'frame_{s}' for s in range(self.batch_size)]
+        del predictions
+        return df
 
     def load_batch(self, v_id: str):
         root = join(DL_PATH, v_id)
@@ -76,10 +87,12 @@ class ImageClassifier:
 
 if __name__ == '__main__':
     img_cf = ImageClassifier()
-    X_train, X_test, y_train, y_test = Indexer.load_split(folder_path='cache/tts_42')
-    y_pred = X_train.iloc[:, 0]
-    y_pred.columns = ['v_id']
-
+    X_train, X_test, _, _ = Indexer.load_split(folder_path='cache/tts_42')
+    print(X_train.shape)
+    print(X_test.shape)
     img_cf.init_model()
-    res = img_cf.classify(X_train.iloc[:10])
-    print(res)
+    classifications = img_cf.classify(X_train.iloc[:TRAIN_SIZE])
+    write_to_file(os.path.join(STORED_PRED_PATH, 'train_data.pkl'), classifications)
+
+    classifications = img_cf.classify(X_test.iloc[:TEST_SIZE])
+    write_to_file(os.path.join(STORED_PRED_PATH, 'test_data.pkl'), classifications)

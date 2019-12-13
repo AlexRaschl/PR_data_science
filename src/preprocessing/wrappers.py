@@ -19,3 +19,7 @@ class FramePredictions(object):
 
     def return_label_descr(self):
         raise NotImplementedError('Not implemented yet!')
+
+    @staticmethod
+    def get_labels_of(frame_predictions):
+        return frame_predictions.labels

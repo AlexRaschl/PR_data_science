@@ -11,7 +11,7 @@ class Indexer:
         self.collection = get_collection_from_db()
         self.seed = seed
 
-    def perform_train_test_split(self, folder_name: str = None, test_size: float = 0.30) -> tuple():
+    def perform_train_test_split(self, folder_name: str = None, test_size: float = 0.10) -> tuple():
         """
         Create train test split of all sampled videos in the database. Returns tuple of pandas dataframes denoting test and train dataset.
         The datasets include the video_id, which can be used for sample lookups, as well as the viewcounts.

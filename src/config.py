@@ -5,7 +5,6 @@ LFM_PATH = r'data/LFM-1b.txt'
 YT_WATCH_STUB = r'https://www.youtube.com/watch?v='
 YT_SEARCH_STUB = r'https://www.youtube.com/results?search_query='
 
-
 CACHE_PATH = 'cache'
 EMPTY_PATH = 'NONE'
 FAIL_PATH = 'FAILED'
@@ -33,3 +32,10 @@ FFMPEG_PATH = "H:\Anwendungen\\ffmpeg\\bin\\ffmpeg.exe"
 N_SAMPLES = 30
 SAMPLE_OFFSET = 10
 SIMILARITY_THRES = 0.95
+
+INDEXED_TTS_PATH = CACHE_PATH + '\\tts_42'
+STORED_PRED_PATH = CACHE_PATH + '\\stored'
+
+# Testing constants
+TRAIN_SIZE = 1894
+TEST_SIZE = 211
