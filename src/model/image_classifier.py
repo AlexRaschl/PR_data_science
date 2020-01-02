@@ -1,5 +1,6 @@
 import os
 from itertools import product
+from itertools import product
 from os import listdir
 from os.path import join, isfile
 
@@ -7,11 +8,11 @@ import numpy as np
 import pandas as pd
 from natsort import natsorted
 from tensorflow.keras import Input
+from tensorflow.keras.applications.resnet_v2 import ResNet50V2
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from src.config import DL_PATH, N_SAMPLES, STORED_PRED_PATH, TRAIN_SIZE, TEST_SIZE
-from src.model.cfw import write_to_file
+from src.config import DL_PATH, N_SAMPLES, TRAIN_SIZE, TEST_SIZE
 from src.preprocessing.indexer import Indexer
 from src.preprocessing.wrappers import FramePredictions
 
@@ -28,6 +29,10 @@ class ImageClassifier:
         if model_name == 'VGG16':
             self.input_shape = Input(shape=(224, 224, 3))
             self.model = VGG16(weights='imagenet')
+
+        elif model_name == 'ResNet50v2':
+            self.input_shape = shape = (224, 224, 3)
+            self.model = ResNet50V2(weights='imagenet')
 
     def classify(self, X):
 
@@ -90,7 +95,7 @@ if __name__ == '__main__':
     X_train, X_test, _, _ = Indexer.load_split(folder_path='cache/tts_42')
     print(X_train.shape)
     print(X_test.shape)
-    img_cf.init_model()
+    img_cf.init_model(model_name='ResNet50v2')
     classifications = img_cf.classify(X_train.iloc[:TRAIN_SIZE])
     write_to_file(os.path.join(STORED_PRED_PATH, 'train_data.pkl'), classifications)
 
