@@ -16,14 +16,20 @@ def load_from_file(filepath: str) -> pd.DataFrame:
     return pd.read_pickle(filepath)
 
 
-def flattened_labels(predictions: pd.DataFrame) -> pd.DataFrame:
-    return predictions.applymap(lambda f: f.labels).apply(np.hstack, axis=1)
+def flattened_labels(predictions: pd.DataFrame, n_labels=None) -> pd.DataFrame:
+    if not n_labels:
+        n_labels = predictions.iloc[0, 0].labels.shape[0]
+
+    return predictions.applymap(lambda f: f.labels[0:n_labels]).apply(np.hstack, axis=1)
 
 
-def feature_data_frame(predictions: pd.DataFrame):
+def feature_data_frame(predictions: pd.DataFrame, n_labels=None):
+    max_labels = predictions.iloc[0, 0].labels.shape[0]
+    n_labels = n_labels if n_labels else max_labels
+
     length = predictions.shape[0]
-    width = predictions.shape[1] * predictions.iloc[0, 0].labels.shape[0]
-    flattened = flattened_labels(predictions)
+    width = predictions.shape[1] * n_labels
+    flattened = flattened_labels(predictions, n_labels)
 
     return np.vstack(flattened.values).reshape(length, width)
 
