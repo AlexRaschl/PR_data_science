@@ -31,7 +31,7 @@ class ImageClassifier:
             self.model = VGG16(weights='imagenet')
 
         elif model_name == 'ResNet50v2':
-            self.input_shape = shape = (224, 224, 3)
+            self.input_shape = (224, 224, 3)
             self.model = ResNet50V2(weights='imagenet')
 
     def classify(self, X):
