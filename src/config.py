@@ -18,7 +18,7 @@ DB_NAME = 'musicvideos'
 DB_COLLECTION = 'yt_final'
 
 # Crawl Configs
-N_CRAWLS = 10000
+N_CRAWLS = 15000
 
 # Download Configs
 DL_DELAY = 10
