@@ -1,6 +1,5 @@
 import os
 from itertools import product
-from itertools import product
 from os import listdir
 from os.path import join, isfile
 
@@ -12,7 +11,8 @@ from tensorflow.keras.applications.resnet_v2 import ResNet50V2
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from src.config import DL_PATH, N_SAMPLES, TRAIN_SIZE, TEST_SIZE
+from src.config import DL_PATH, N_SAMPLES, STORED_PRED_PATH
+from src.model.cfw import write_to_file
 from src.preprocessing.indexer import Indexer
 from src.preprocessing.wrappers import FramePredictions
 
@@ -96,8 +96,8 @@ if __name__ == '__main__':
     print(X_train.shape)
     print(X_test.shape)
     img_cf.init_model(model_name='ResNet50v2')
-    classifications = img_cf.classify(X_train.iloc[:TRAIN_SIZE])
+    classifications = img_cf.classify(X_train)
     write_to_file(os.path.join(STORED_PRED_PATH, 'train_data.pkl'), classifications)
 
-    classifications = img_cf.classify(X_test.iloc[:TEST_SIZE])
+    classifications = img_cf.classify(X_test)
     write_to_file(os.path.join(STORED_PRED_PATH, 'test_data.pkl'), classifications)

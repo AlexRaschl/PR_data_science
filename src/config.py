@@ -18,7 +18,7 @@ DB_NAME = 'musicvideos'
 DB_COLLECTION = 'yt_final'
 
 # Crawl Configs
-N_CRAWLS = 5000
+N_CRAWLS = 10000
 
 # Download Configs
 DL_DELAY = 10
@@ -37,5 +37,5 @@ INDEXED_TTS_PATH = CACHE_PATH + '\\tts_42'
 STORED_PRED_PATH = CACHE_PATH + '\\stored'
 
 # Testing constants
-TRAIN_SIZE = 1894
-TEST_SIZE = 211
+TRAIN_SIZE = 3483
+TEST_SIZE = 388
