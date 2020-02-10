@@ -14,7 +14,7 @@ def get_metadata(v_id: str, keys: list) -> dict:
 
 def get_metaframe(df: pd.DataFrame, keys: list = None) -> pd.DataFrame:
     if keys is None:
-        keys = ['v_likes', 'v_dislikes', 'v_duration', 'v_avg_rating']
+        keys = ['song_name', 'creator', 'v_likes', 'v_dislikes', 'v_duration', 'v_avg_rating']
 
     df = df.copy()
     df.reindex(columns=[*df.columns.tolist(), *keys])
