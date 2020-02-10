@@ -1,6 +1,8 @@
 API_KEY = 'AIzaSyCj9-VpsoNOKui6MpJUPKPWTa8tnj1Mv98'
 
+# DATA
 LFM_PATH = r'data/LFM-1b.txt'
+LABEL_TO_STRING_PATH = r'data/imagenet1000_clsidx_to_labels.txt'
 
 YT_WATCH_STUB = r'https://www.youtube.com/watch?v='
 YT_SEARCH_STUB = r'https://www.youtube.com/results?search_query='
@@ -33,8 +35,10 @@ N_SAMPLES = 30
 SAMPLE_OFFSET = 10
 SIMILARITY_THRES = 0.95
 
+# CACHE
 INDEXED_TTS_PATH = CACHE_PATH + '\\tts_42'
 STORED_PRED_PATH = CACHE_PATH + '\\stored'
+CACHED_LABEL_STRINGS = CACHE_PATH + '\\labels\\labels.pkl'
 
 # Testing constants
 TRAIN_SIZE = 3483

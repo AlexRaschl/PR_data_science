@@ -34,6 +34,18 @@ def feature_data_frame(predictions: pd.DataFrame, n_labels=None):
     return np.vstack(flattened.values).reshape(length, width)
 
 
+def label_to_text_data_frame(predictions: pd.DataFrame, n_labels=None):
+    max_labels = predictions.iloc[0, 0].labels.shape[0]
+    n_labels = n_labels if n_labels else max_labels
+
+    length = predictions.shape[0]
+    width = predictions.shape[1] * n_labels
+
+    flattened = predictions.applymap(lambda f: f.return_label_descr()[0:n_labels])
+    flattened = flattened.apply(np.hstack, axis=1)
+    return pd.DataFrame(np.vstack(flattened.values).reshape(length, width), index=predictions.index)
+
+
 def load_train_test_split():
     X_train = load_from_file(os.path.join(STORED_PRED_PATH, 'train_data.pkl'))
     X_test = load_from_file(os.path.join(STORED_PRED_PATH, 'test_data.pkl'))
