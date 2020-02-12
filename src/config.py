@@ -1,3 +1,5 @@
+import multiprocessing
+
 API_KEY = 'AIzaSyCj9-VpsoNOKui6MpJUPKPWTa8tnj1Mv98'
 
 # DATA
@@ -20,7 +22,7 @@ DB_NAME = 'musicvideos'
 DB_COLLECTION = 'yt_final'
 
 # Crawl Configs
-N_CRAWLS = 15000
+N_CRAWLS = 17000
 
 # Download Configs
 DL_DELAY = 10
@@ -43,3 +45,10 @@ CACHED_LABEL_STRINGS = CACHE_PATH + '\\labels\\labels.pkl'
 # Testing constants
 TRAIN_SIZE = 3483
 TEST_SIZE = 388
+SPLIT_SEED = 42
+
+# GridSearchCV
+N_JOBS = (multiprocessing.cpu_count() * (2 / 3))
+GRID_SEARCH_LOG_FOLDER = 'logs\\gscv'
+SEARCH_METRICS = ('accuracy',)
+FILE_CREATION_MODE = 'w'
