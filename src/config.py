@@ -38,17 +38,20 @@ SAMPLE_OFFSET = 10
 SIMILARITY_THRES = 0.95
 
 # CACHE
-INDEXED_TTS_PATH = CACHE_PATH + '\\tts_42'
-STORED_PRED_PATH = CACHE_PATH + '\\stored'
+SPLIT_SEED = 42
+INDEXED_TTS_PATH = CACHE_PATH + '\\tts_' + str(SPLIT_SEED)
+STORED_PRED_PATH = INDEXED_TTS_PATH + '\\cnn_pred'
 CACHED_LABEL_STRINGS = CACHE_PATH + '\\labels\\labels.pkl'
 
 # Testing constants
 TRAIN_SIZE = 3483
 TEST_SIZE = 388
-SPLIT_SEED = 42
 
 # GridSearchCV
-N_JOBS = (multiprocessing.cpu_count() * (2 / 3))
+N_JOBS = int(multiprocessing.cpu_count() * (2 / 3))
 GRID_SEARCH_LOG_FOLDER = 'logs\\gscv'
-SEARCH_METRICS = ('accuracy',)
+SEARCH_METRICS = ('neg_mean_absolute_error',)
 FILE_CREATION_MODE = 'w'
+
+# Visualization Path
+VIS_PATH = 'visualisations\\'

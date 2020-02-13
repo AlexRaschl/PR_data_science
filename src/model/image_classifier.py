@@ -1,4 +1,3 @@
-import os
 from itertools import product
 from os import listdir
 from os.path import join, isfile
@@ -11,8 +10,7 @@ from tensorflow.keras.applications.resnet_v2 import ResNet50V2
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from src.config import DL_PATH, N_SAMPLES, STORED_PRED_PATH
-from src.model.cfw import write_to_file
+from src.config import DL_PATH, N_SAMPLES, INDEXED_TTS_PATH
 from src.preprocessing.indexer import Indexer
 from src.preprocessing.wrappers import FramePredictions
 
@@ -35,7 +33,6 @@ class ImageClassifier:
             self.model = ResNet50V2(weights='imagenet')
 
     def classify(self, X):
-
         predictions = np.empty(shape=(X.shape[0], self.batch_size),
                                dtype=np.dtype([
                                    ('predictions', np.int64, (self.n_predictions,)),
@@ -44,6 +41,7 @@ class ImageClassifier:
         for idx, v_id in enumerate(X.iloc[:, 0]):
             batch = self.load_batch(v_id)
             res = self.model.predict(batch, batch_size=self.batch_size)
+            # pr = decode_predictions(res, top=5)
             labels = np.argsort(res, axis=-1)[:, -self.n_predictions - 1:-1]
             labels = labels[:, ::-1]
             probabilities = np.empty(shape=(30, 5), dtype=np.float64)
@@ -92,12 +90,12 @@ class ImageClassifier:
 
 if __name__ == '__main__':
     img_cf = ImageClassifier()
-    X_train, X_test, _, _ = Indexer.load_split(folder_path='cache/tts_42')
+    X_train, X_test, _, _ = Indexer.load_split(folder_path=INDEXED_TTS_PATH)
     print(X_train.shape)
     print(X_test.shape)
     img_cf.init_model(model_name='ResNet50v2')
     classifications = img_cf.classify(X_train)
-    write_to_file(os.path.join(STORED_PRED_PATH, 'train_data.pkl'), classifications)
+    # write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
 
     classifications = img_cf.classify(X_test)
-    write_to_file(os.path.join(STORED_PRED_PATH, 'test_data.pkl'), classifications)
+    # write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
