@@ -68,7 +68,8 @@ def perform_grid_search(model, param_grid: dict, log_name: str,
     """
 
     X_train, X_test, y_train, y_test = preprocess_data(
-        *load_train_test_split(dataset, seed, feature_frame='CNN' in dataset), n_components=0.95)
+        *load_train_test_split(dataset, seed, feature_frame='CNN' in dataset, n_labels=n_labels, **kwargs),
+        n_components=0.95)
     general_args = {**kwargs, 'n_labels': n_labels, 'dataset': dataset, 'cv': cv, 'seed': seed}
     logger = init_logger(log_name)
     logger.info('STARTING GRID SEARCH')

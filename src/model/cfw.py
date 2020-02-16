@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 from src.config import INDEXED_TTS_PATH, STORED_PRED_PATH, TRAIN_SIZE, TEST_SIZE, SPLIT_SEED
 from src.preprocessing.indexer import Indexer
@@ -42,7 +42,8 @@ def label_to_text_data_frame(predictions: pd.DataFrame, n_labels=None):
     return pd.DataFrame(np.vstack(flattened.values).reshape(length, width), index=predictions.index)
 
 
-def load_train_test_split(dataset: str = 'CNN', split_seed: int = SPLIT_SEED, feature_frame=False):
+def load_train_test_split(dataset: str = 'CNN', split_seed: int = SPLIT_SEED,
+                          feature_frame=False, n_labels=None, **kwargs):
     # TODO INCORPORATE SPLIT SEED
     if dataset == 'CNN':
         X_train = load_from_file(os.path.join(STORED_PRED_PATH, 'train_cnn_pred.pkl'))
@@ -57,8 +58,14 @@ def load_train_test_split(dataset: str = 'CNN', split_seed: int = SPLIT_SEED, fe
         y_test.set_index(X_test.index, inplace=True)
 
         if feature_frame:
-            X_train = feature_data_frame(X_train)
-            X_test = feature_data_frame(X_test)
+            X_train = feature_data_frame(X_train, n_labels)
+            X_test = feature_data_frame(X_test, n_labels)
+
+            if kwargs.get('one_hot_inputs', False):
+                ohe = OneHotEncoder(categories=np.array([range(0, 1000) for i in range(0, X_train.shape[0])]))
+                ohe.fit(X_train)
+                X_train = ohe.transform(X_train)
+                X_test = ohe.transform(X_test)
 
         return X_train, X_test, y_train, y_test
     else:
