@@ -12,6 +12,7 @@ YT_SEARCH_STUB = r'https://www.youtube.com/results?search_query='
 CACHE_PATH = 'cache'
 EMPTY_PATH = 'NONE'
 FAIL_PATH = 'FAILED'
+DELETED_PATH = 'DELETED'
 
 # N_LINKS_SEARCHED = 5
 
@@ -32,6 +33,7 @@ JSON_INFO_EXTENSION = '.info.json'
 # Preprocessing configs
 RES_RSCLD = (480, 360)
 FFMPEG_PATH = "H:\Anwendungen\\ffmpeg\\bin\\ffmpeg.exe"
+DELETE_FP = True
 
 N_SAMPLES = 30
 SAMPLE_OFFSET = 10

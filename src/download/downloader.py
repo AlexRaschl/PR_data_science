@@ -31,9 +31,9 @@ class Downloader:
             'progress_hooks': [self.dl_hook],
             'format': 'best[height<=360][width<=640]',  # Download in 360p or lower,
             'verbose': True,
-            'force-ipv4': True,
-            'print-traffic': True
-            # 'proxy': 'https://85.214.250.48:3128'
+            # 'force-ipv4': True,
+            'print-traffic': False,
+            # 'proxy': ''
         }
         self.ydl = YoutubeDL(self.options)
 

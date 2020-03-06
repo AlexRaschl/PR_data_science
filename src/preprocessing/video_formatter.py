@@ -1,10 +1,13 @@
+import os
+import shutil
 from os import *
 
 import cv2
 from ffmpy import FFmpeg
 from skimage.measure._structural_similarity import structural_similarity as ssim
 
-from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES, N_CRAWLS, FAIL_PATH
+from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES, N_CRAWLS, FAIL_PATH, \
+    DELETED_PATH, DELETE_FP
 from src.config import FFMPEG_PATH
 from src.database.db_utils import get_collection_from_db
 
@@ -97,12 +100,13 @@ class VideoSampler:
         self.collection = get_collection_from_db()
         self.resolution = RES_RSCLD
 
-    def sample(self, n_vids=1000, n_samples=N_SAMPLES, offset=SAMPLE_OFFSET):
+    def sample(self, n_vids=1000, n_samples=N_SAMPLES, offset=SAMPLE_OFFSET, delete_false_positives=False):
         for i in range(n_vids):
             vid = self.collection.find_one({"$and": [
                 {'v_found': True},
                 {'v_filepath': {"$ne": EMPTY_PATH}},
                 {'v_filepath': {"$ne": FAIL_PATH}},
+                {'v_filepath': {"$ne": DELETED_PATH}},
                 {'sampled': {"$ne": True}},
             ]})
 
@@ -110,13 +114,9 @@ class VideoSampler:
                 print("No videos left to sample!")
                 return
             print(f'Sampling-step {i}: {vid["v_id"]} - {vid["v_title"]}')
-            self.sample_images(vid, n_samples, offset)
+            self.sample_images(vid, n_samples, offset, delete_false_positives=delete_false_positives)
 
-    def sample_images(self, vid, n_samples, offset, recheck_mv=True):
-        # vid = self.collection.find_one({"$and": [{'v_id': v_id},
-        #                                          # {'v_found': True},
-        #                                          {'v_filepath':
-        #                                               {"$ne": EMPTY_PATH}}]})
+    def sample_images(self, vid, n_samples, offset, recheck_mv=True, delete_false_positives=False):
 
         scale_vid = vid['v_res'] != RES_RSCLD
         vid_path = vid['v_filepath']
@@ -153,7 +153,7 @@ class VideoSampler:
                         equality_count = equality_count + 1 if self.check_equal(old_frame, frame) else equality_count
                     old_frame = frame
 
-            print(equality_count)
+            print(f'Equal frames detected: {equality_count}')
             cap.release()
             cv2.destroyAllWindows()
 
@@ -162,18 +162,41 @@ class VideoSampler:
             return
         else:
             is_equal = equality_count >= n_samples / 2
-            print(is_equal)
-            self.collection.update_one({'v_id': vid['v_id']},
-                                       {"$set":
-                                           {
-                                               'sampled': True,
-                                               'n_samples': n_samples,
-                                               'v_found': not is_equal or not recheck_mv
-                                           }})
+            print(f'Not a Music Video?: {is_equal}')
+
+            if delete_false_positives and recheck_mv and is_equal:
+                print(f"Delete false positive Video {vid['v_id']}")
+                self.delete_video(vid)
+                self.collection.update_one({'v_id': vid['v_id']},
+                                           {"$set":
+                                               {
+                                                   'sampled': False,
+                                                   'v_found': False,
+                                                   'v_filepath': 'DELETED'
+                                               }})
+
+            else:
+                self.collection.update_one({'v_id': vid['v_id']},
+                                           {"$set":
+                                               {
+                                                   'sampled': True,
+                                                   'n_samples': n_samples,
+                                                   'v_found': not is_equal or not recheck_mv
+                                               }})
 
     @staticmethod
     def sample_path(vid):
         return f"{DL_PATH}{vid['v_id']}"
+
+    @staticmethod
+    def delete_video(vid: dict):
+        path = f"{DL_PATH}{vid['v_filepath']}"
+        if os.path.exists(path) and os.path.isfile(path):
+            os.remove(path)
+            os.remove('.'.join([os.path.splitext(path)[0], 'info', 'json']))
+            shutil.rmtree(f"{DL_PATH}{vid['v_id']}")
+        else:
+            raise IOError('Path not existing or a directory')
 
     def check_equal(self, old_frame, frame):
         diff = ssim(old_frame, frame, data_range=frame.max() - frame.min(), multichannel=True)
@@ -183,4 +206,4 @@ class VideoSampler:
 
 if __name__ == '__main__':
     vm = VideoSampler()
-    vm.sample(n_vids=N_CRAWLS)
+    vm.sample(n_vids=N_CRAWLS, delete_false_positives=DELETE_FP)
