@@ -22,10 +22,10 @@ DB_NAME = 'musicvideos'
 DB_COLLECTION = 'yt_final'
 
 # Crawl Configs
-N_CRAWLS = 25000
+N_CRAWLS = 35000
 
 # Download Configs
-DL_DELAY = 10
+DL_DELAY = 20
 DL_PATH = "H:\\Datasets\\YouTubeFinal\\"
 JSON_INFO_EXTENSION = '.info.json'
 
