@@ -95,7 +95,7 @@ if __name__ == '__main__':
     print(X_test.shape)
     img_cf.init_model(model_name='ResNet50v2')
     classifications = img_cf.classify(X_train)
-    # write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
+   # write_to_file(os.path.join(STORED_PRED_PATH, 'train_cnn_pred.pkl'), classifications)
 
     classifications = img_cf.classify(X_test)
-    # write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
+# write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
