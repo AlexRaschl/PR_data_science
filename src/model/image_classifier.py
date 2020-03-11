@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 from natsort import natsorted
 from tensorflow.keras import Input
-from tensorflow.keras.applications.resnet_v2 import ResNet50V2
+from tensorflow.keras.applications.resnet import ResNet50
+from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -17,7 +18,7 @@ from src.preprocessing.wrappers import FramePredictions
 
 class ImageClassifier:
 
-    def __init__(self, batch_size: int = N_SAMPLES, n_predictions=5):
+    def __init__(self, batch_size: int = N_SAMPLES, n_predictions=10):
         self.batch_size = batch_size
         self.input_shape = None
         self.model = None
@@ -30,7 +31,7 @@ class ImageClassifier:
 
         elif model_name == 'ResNet50v2':
             self.input_shape = (224, 224, 3)
-            self.model = ResNet50V2(weights='imagenet')
+            self.model = ResNet50(weights='imagenet')
 
     def classify(self, X):
         predictions = np.empty(shape=(X.shape[0], self.batch_size),
@@ -71,21 +72,14 @@ class ImageClassifier:
         fnames = {'filenames': natsorted([f for f in listdir(root) if isfile(join(root, f))])}
         df = pd.DataFrame(fnames)
 
-        train_datagen = ImageDataGenerator(
-            rescale=1. / 255,
-            shear_range=0.2,
-            zoom_range=0.2,
-            horizontal_flip=False)
+        datagen = ImageDataGenerator()
+        generator = datagen.flow_from_dataframe(df, batch_size=self.batch_size,
+                                                directory=join(DL_PATH, v_id),
+                                                shuffle=False, x_col='filenames',
+                                                target_size=(224, 224),
+                                                class_mode=None)
 
-        train_generator = train_datagen.flow_from_dataframe(
-            df,
-            directory=join(DL_PATH, v_id),
-            target_size=(224, 224),
-            batch_size=self.batch_size,
-            class_mode=None,
-            x_col='filenames')
-
-        return train_generator.next()
+        return preprocess_input(generator.next())
 
 
 if __name__ == '__main__':
@@ -95,7 +89,7 @@ if __name__ == '__main__':
     print(X_test.shape)
     img_cf.init_model(model_name='ResNet50v2')
     classifications = img_cf.classify(X_train)
-   # write_to_file(os.path.join(STORED_PRED_PATH, 'train_cnn_pred.pkl'), classifications)
+    # write_to_file(os.path.join(STORED_PRED_PATH, 'train_cnn_pred.pkl'), classifications)
 
     classifications = img_cf.classify(X_test)
-# write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
+    #write_to_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'), classifications)
