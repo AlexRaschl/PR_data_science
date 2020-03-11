@@ -46,8 +46,8 @@ STORED_PRED_PATH = INDEXED_TTS_PATH + '\\cnn_pred'
 CACHED_LABEL_STRINGS = CACHE_PATH + '\\labels\\labels.pkl'
 
 # Testing constants
-TRAIN_SIZE = 3483
-TEST_SIZE = 388
+TRAIN_SIZE = 9344
+TEST_SIZE = 1039
 
 # GridSearchCV
 N_JOBS = int(multiprocessing.cpu_count() * (2 / 3))
