@@ -62,7 +62,8 @@ def load_train_test_split(dataset: str = 'CNN', split_seed: int = SPLIT_SEED,
             X_test = feature_data_frame(X_test, n_labels)
 
             if kwargs.get('one_hot_inputs', False):
-                ohe = OneHotEncoder(categories=np.array([range(0, 1000) for i in range(0, X_train.shape[0])]))
+                categories = list([range(0, 1000) for i in range(0, X_train.shape[1])])
+                ohe = OneHotEncoder(categories=categories, dtype=np.int64)
                 ohe.fit(X_train)
                 X_train = ohe.transform(X_train)
                 X_test = ohe.transform(X_test)
