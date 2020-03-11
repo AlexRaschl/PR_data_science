@@ -33,10 +33,16 @@ def feature_data_frame(predictions: pd.DataFrame, n_labels=None):
     return pd.DataFrame(np.vstack(flattened.values).reshape(length, width), index=predictions.index)
 
 
+def get_textual_description(predictions: pd.DataFrame, selector=None, n_labels=None):
+    if selector is None:
+        return label_to_text_data_frame(predictions, n_labels)
+    elif isinstance(selector, (int, tuple)):
+        return label_to_text_data_frame(predictions.iloc[selector], n_labels)
+
+
 def label_to_text_data_frame(predictions: pd.DataFrame, n_labels=None):
     n_labels = _fetch_n_labels(predictions, n_labels)
     length, width = _fetch_len_width(predictions, n_labels)
-
     flattened = predictions.applymap(lambda f: f.return_label_descr()[0:n_labels])
     flattened = flattened.apply(np.hstack, axis=1)
     return pd.DataFrame(np.vstack(flattened.values).reshape(length, width), index=predictions.index)
@@ -87,7 +93,7 @@ def _check_shapes(train: pd.DataFrame, test: pd.DataFrame):
         raise ValueError('Shapes do not match!')
 
 
-def preprocess_data(X_train, X_test, y_train, y_test, n_components=-1.0, std_scale: bool = True):
+def preprocess_data(X_train, X_test, y_train, y_test, n_components=-1.0, std_scale: bool = False):
     if std_scale:
         std = StandardScaler().fit(X=X_train)
         X_train = std.transform(X_train)
