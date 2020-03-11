@@ -69,7 +69,7 @@ def perform_grid_search(model, param_grid: dict, log_name: str,
 
     X_train, X_test, y_train, y_test = preprocess_data(
         *load_train_test_split(dataset, seed, feature_frame='CNN' in dataset, n_labels=n_labels, **kwargs),
-        n_components=0.95)
+        n_components=kwargs.get('n_components', -1), std_scale=kwargs.get('std_scale', False))
     general_args = {**kwargs, 'n_labels': n_labels, 'dataset': dataset, 'cv': cv, 'seed': seed}
     logger = init_logger(log_name)
     logger.info('STARTING GRID SEARCH')
@@ -113,7 +113,7 @@ def __test_best_param_setting(gscv: GridSearchCV, model, logger, general_args):
     ds = general_args.get('dataset')
     seed = general_args.get('seed')
     n_components = general_args.get('n_components', -1.0)
-    std_scale = general_args.get('std_scale', True)
+    std_scale = general_args.get('std_scale', False)
 
     X_train, X_test, y_train, y_test = preprocess_data(
         *load_train_test_split(ds, seed, feature_frame='CNN' in ds), n_components, std_scale)

@@ -4,7 +4,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from src.model.cv import cross_validation as gscv
 
 
-def grid_search_knn(datasets, grid=None, n_components=0.95):
+def grid_search_knn(datasets, grid=None):
     param_grid = grid or [
         {
             'n_neighbors': range(1, 10, 5),
@@ -12,10 +12,10 @@ def grid_search_knn(datasets, grid=None, n_components=0.95):
     ]
     for ds in datasets:
         gscv.perform_grid_search(KNeighborsRegressor(), param_grid, f'gs_knn_{ds}.log',
-                                 n_components=n_components, one_hot_inputs=True)
+                                 dataset=ds, one_hot_inputs=True, n_labels=2)
 
 
-def grid_search_svr(datasets, grid=None, n_components=0.95):
+def grid_search_svr(datasets, grid=None):
     param_grid = grid or [
         {
             'kernel': ['rbf', 'poly', 'linear'],
@@ -27,10 +27,11 @@ def grid_search_svr(datasets, grid=None, n_components=0.95):
     ]
     for ds in datasets:
         gscv.perform_grid_search(RandomForestRegressor, param_grid, f'gs_svr_{ds}.log',
-                                 n_components=n_components)
+                                 dataset=ds,
+                                 )
 
 
-def grid_search_rf(datasets, grid=None, n_components=0.95):
+def grid_search_rf(datasets, grid=None):
     param_grid = grid or [
         {
             'n_estimators': (10, 15, 100, 150),
@@ -43,7 +44,8 @@ def grid_search_rf(datasets, grid=None, n_components=0.95):
     ]
     for ds in datasets:
         gscv.perform_grid_search(RandomForestRegressor(), param_grid, f'gs_rf_{ds}.log',
-                                 n_components=n_components)
+                                 dataset=ds,
+                                 )
 
 
-grid_search_knn('CNN')
+grid_search_rf(['CNN'])
