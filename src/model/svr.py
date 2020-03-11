@@ -1,4 +1,4 @@
-from sklearn.metrics.regression import mean_absolute_error
+from sklearn.metrics import mean_absolute_error
 from sklearn.svm import SVR
 
 from src.model import cfw
