@@ -43,6 +43,7 @@ SIMILARITY_THRES = 0.95
 SPLIT_SEED = 42
 INDEXED_TTS_PATH = CACHE_PATH + '\\tts_' + str(SPLIT_SEED)
 STORED_PRED_PATH = INDEXED_TTS_PATH + '\\cnn_pred'
+STORED_FACE_PATH = INDEXED_TTS_PATH + '\\faces'
 CACHED_LABEL_STRINGS = CACHE_PATH + '\\labels\\labels.pkl'
 
 # Testing constants
@@ -57,3 +58,6 @@ FILE_CREATION_MODE = 'w'
 
 # Visualization Path
 VIS_PATH = 'visualisations\\'
+
+# Face Cascade
+CASCADE_PATH = 'data/haarcascade_frontalface_default.xml'
