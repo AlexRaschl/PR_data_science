@@ -3,6 +3,7 @@ from typing import Tuple
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 from src.database.db_utils import get_collection_from_db, CACHE_PATH
 
@@ -20,9 +21,9 @@ class Indexer:
         @param test_size: Proportion of test set size
         """
         samples = list(self.collection.find(filter={'sampled': True, 'v_found': True}))
-        X = pd.DataFrame(list([(s["v_id"], s['n_samples'], s['v_duration']) for s in samples]),
+        X = pd.DataFrame(list([(s["v_id"], s['n_samples'], s['v_duration']) for s in tqdm(samples)]),
                          columns=['v_id', 'n_samples', 'v_duration'])
-        y = pd.DataFrame(list([s["v_views"] for s in samples]), columns=['v_views'])
+        y = pd.DataFrame(list([s["v_views"] for s in tqdm(samples)]), columns=['v_views'])
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=self.seed)
 
