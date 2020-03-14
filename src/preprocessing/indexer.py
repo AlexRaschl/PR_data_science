@@ -1,4 +1,5 @@
 import os
+from typing import Tuple
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -11,7 +12,7 @@ class Indexer:
         self.collection = get_collection_from_db()
         self.seed = seed
 
-    def perform_train_test_split(self, folder_name: str = None, test_size: float = 0.10) -> tuple():
+    def perform_train_test_split(self, folder_name: str = None, test_size: float = 0.10) -> Tuple[pd.DataFrame]:
         """
         Create train test split of all sampled videos in the database. Returns tuple of pandas dataframes denoting test and train dataset.
         The datasets include the video_id, which can be used for sample lookups, as well as the viewcounts.
@@ -19,7 +20,8 @@ class Indexer:
         @param test_size: Proportion of test set size
         """
         samples = list(self.collection.find(filter={'sampled': True, 'v_found': True}))
-        X = pd.DataFrame(list([(s["v_id"], s['n_samples']) for s in samples]), columns=['v_id', 'n_samples'])
+        X = pd.DataFrame(list([(s["v_id"], s['n_samples'], s['v_duration']) for s in samples]),
+                         columns=['v_id', 'n_samples', 'v_duration'])
         y = pd.DataFrame(list([s["v_views"] for s in samples]), columns=['v_views'])
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=self.seed)
