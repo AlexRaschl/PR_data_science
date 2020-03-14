@@ -29,7 +29,7 @@ class ImageClassifier:
             self.input_shape = Input(shape=(224, 224, 3))
             self.model = VGG16(weights='imagenet')
 
-        elif model_name == 'ResNet50v2':
+        elif model_name == 'ResNet50':
             self.input_shape = (224, 224, 3)
             self.model = ResNet50(weights='imagenet')
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     X_train, X_test, _, _ = Indexer.load_split(folder_path=INDEXED_TTS_PATH)
     print(X_train.shape)
     print(X_test.shape)
-    img_cf.init_model(model_name='ResNet50v2')
+    img_cf.init_model(model_name='ResNet50')
     classifications = img_cf.classify(X_train)
     # write_to_file(os.path.join(STORED_PRED_PATH, 'train_cnn_pred.pkl'), classifications)
 
