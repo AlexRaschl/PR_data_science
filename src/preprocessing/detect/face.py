@@ -1,5 +1,4 @@
 import glob
-import os
 from typing import List
 
 import cv2
@@ -9,7 +8,6 @@ from natsort import natsorted
 from tqdm import tqdm
 
 from src.config import *
-from src.model.cfw import write_to_file
 from src.preprocessing.datamanager import DataManager
 from src.preprocessing.indexer import Indexer
 
@@ -20,7 +18,7 @@ class FaceDetector:
         self.face_cascade = cv2.CascadeClassifier(CASCADE_PATH)
 
     def get_face_counts(self, X: pd.DataFrame):
-        v_ids = FaceDetector.extract_v_ids(X)
+        v_ids = DataManager.extract_v_ids(X)
         n_faces = [self.detect_faces(v_id) for v_id in tqdm(v_ids)]
         return pd.DataFrame({'v_id': v_ids, 'n_faces': n_faces})
 
@@ -40,15 +38,11 @@ class FaceDetector:
         return [cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY) for path in
                 natsorted(glob.glob(DataManager.sample_path_from_id(v_id) + '/*'))]
 
-    @staticmethod
-    def extract_v_ids(X: pd.DataFrame) -> List[str]:
-        return X.v_id.tolist()
-
 
 if __name__ == '__main__':
     fd = FaceDetector()
     X_train, X_test, _, _ = Indexer.load_split(folder_path=INDEXED_TTS_PATH)
     face_frame = fd.get_face_counts(X_train)
-    write_to_file(os.path.join(STORED_FACE_PATH, 'train_faces.pkl'), face_frame)
+    # write_to_file(os.path.join(STORED_FACE_PATH, 'train_faces.pkl'), face_frame)
     face_frame = fd.get_face_counts(X_test)
-    write_to_file(os.path.join(STORED_FACE_PATH, 'test_faces.pkl'), face_frame)
+# write_to_file(os.path.join(STORED_FACE_PATH, 'test_faces.pkl'), face_frame)
