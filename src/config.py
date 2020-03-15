@@ -44,6 +44,8 @@ SPLIT_SEED = 42
 INDEXED_TTS_PATH = CACHE_PATH + '\\tts_' + str(SPLIT_SEED)
 STORED_PRED_PATH = INDEXED_TTS_PATH + '\\cnn_pred'
 STORED_FACE_PATH = INDEXED_TTS_PATH + '\\faces'
+STORED_COLOR_PATH = INDEXED_TTS_PATH + '\\colors'
+
 CACHED_LABEL_STRINGS = CACHE_PATH + '\\labels\\labels.pkl'
 
 # Testing constants
