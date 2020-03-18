@@ -117,7 +117,7 @@ class VideoSampler:
                 {'v_filepath': {"$ne": EMPTY_PATH}},
                 {'v_filepath': {"$ne": FAIL_PATH}},
                 {'v_filepath': {"$ne": DELETED_PATH}},
-                {'sampled': {"$ne": True}}
+                {'sampled': {"$ne": True}},
             ]})
 
             if vid is None:
@@ -152,7 +152,7 @@ class VideoSampler:
                 if not ret:
                     break
 
-                if i >= offset * fps and i % step_size == 0:
+                if i >= offset * fps and i % step_size == 0 and c < n_samples:
                     c += 1
                     frame = cv2.resize(frame, RES_RSCLD, fx=0, fy=0,
                                        interpolation=cv2.INTER_CUBIC) if scale_vid else frame
