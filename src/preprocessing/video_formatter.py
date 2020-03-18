@@ -1,4 +1,14 @@
-import os
+import shutil
+from os import *
+
+import cv2
+from ffmpy import FFmpeg
+from skimage.measure._structural_similarity import structural_similarity as ssim
+
+from src.config import DL_PATH, RES_RSCLD, EMPTY_PATH, SAMPLE_OFFSET, N_SAMPLES, SIMILARITY_THRES, N_CRAWLS, FAIL_PATH, \
+    DELETED_PATH, DELETE_FP
+from src.config import FFMPEG_PATH
+from src.database.db_utils import get_collection_from_db
 import shutil
 from os import *
 
@@ -107,7 +117,7 @@ class VideoSampler:
                 {'v_filepath': {"$ne": EMPTY_PATH}},
                 {'v_filepath': {"$ne": FAIL_PATH}},
                 {'v_filepath': {"$ne": DELETED_PATH}},
-                {'sampled': {"$ne": True}},
+                {'sampled': {"$ne": True}}
             ]})
 
             if vid is None:
@@ -135,14 +145,15 @@ class VideoSampler:
 
             old_frame = None
             equality_count = count = 0
+            c = 0
             for i in range(n_frames):  # TODO ? - n_frames % n_samples):
                 ret, frame = cap.read()
 
                 if not ret:
                     break
 
-                if i > offset * fps and i % step_size == 0:
-
+                if i >= offset * fps and i % step_size == 0:
+                    c += 1
                     frame = cv2.resize(frame, RES_RSCLD, fx=0, fy=0,
                                        interpolation=cv2.INTER_CUBIC) if scale_vid else frame
                     # cv2.imshow('image', frame)
@@ -180,9 +191,10 @@ class VideoSampler:
                                            {"$set":
                                                {
                                                    'sampled': True,
-                                                   'n_samples': n_samples,
+                                                   'n_samples': c,
                                                    'v_found': not is_equal or not recheck_mv
                                                }})
+                c = 0
 
     @staticmethod
     def sample_path(vid):
