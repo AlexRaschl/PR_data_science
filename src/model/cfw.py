@@ -52,8 +52,8 @@ def load_train_test_split(dataset: str = 'CNN', split_seed: int = SPLIT_SEED,
                           feature_frame=False, n_labels=None, **kwargs):
     # TODO INCORPORATE SPLIT SEED
     if dataset == 'CNN':
-        X_train = load_from_file(os.path.join(STORED_PRED_PATH, 'train_cnn_pred.pkl'))
-        X_test = load_from_file(os.path.join(STORED_PRED_PATH, 'test_cnn_pred.pkl'))
+        X_train = load_from_file(os.path.join(STORED_PRED_PATH, 'train_cnn_agg_False.pkl'))
+        X_test = load_from_file(os.path.join(STORED_PRED_PATH, 'test_cnn_agg_False.pkl'))
 
         _, _, y_train, y_test = Indexer.load_split(INDEXED_TTS_PATH)
 
