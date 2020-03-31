@@ -15,9 +15,10 @@ class DataManager:
 
     @staticmethod
     def load_tts_data(duration_ds=False, cnn_ds=True, color_ds=False, face_ds=False, cnn_agg=True,
-                      ohe_cnn=False, ohe_color=False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+                      ohe_cnn=False, ohe_color=False, nlabels=None) -> Tuple[
+        pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         if cnn_ds and ohe_cnn:
-            return load_train_test_split(feature_frame=True, one_hot_inputs=True)
+            return load_train_test_split(feature_frame=True, one_hot_inputs=True, nlabels=nlabels)
 
         # Set indizes for joins
         X_train, X_test, y_train, y_test = Indexer.load_split(INDEXED_TTS_PATH)
