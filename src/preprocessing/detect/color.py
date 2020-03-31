@@ -1,6 +1,6 @@
-import glob
+import glob as glob
 import os
-from typing import List, Tuple
+from typing import List
 
 import cv2
 import numpy as np
@@ -15,30 +15,54 @@ from src.preprocessing.indexer import Indexer
 
 
 class ColorDetector:
-    def __init__(self, batch_size: int = N_SAMPLES, n_intervals: int = 10):
-        self.batch_size = batch_size
-        self.borders = (self.__generate_intervals(n_intervals))
+    def __init__(self, batch_size: int = N_SAMPLES, n_intervals: int = None):
+        self.batch_size = batch_size  #
+        self.borders = (self.__generate_intervals(n_intervals, prefabs=n_intervals is None))
 
     def get_color_aggregates(self, X: pd.DataFrame) -> pd.DataFrame:
         v_ids = DataManager.extract_v_ids(X)
         dominant_colors = np.array([self.detect_colors(v_id) for v_id in tqdm(v_ids)])
         df = pd.DataFrame(dominant_colors, index=X.v_id)
-        df.columns = [f'frame_{i}' for i in range(dominant_colors.shape[1])]
-        df.reset_index(inplace=True)
+        df.columns = [f'frame_{i}' for i in range(self.batch_size)]
         df['most_dominant'] = df.apply(lambda row: self.__return_most_frequent(row), axis=1)
+        df.reset_index(inplace=True)
         return df
 
     def detect_colors(self, v_id: str) -> List[np.ndarray]:
         images = self.load_batch(v_id)
         dominant_colors = []
-        for img in images:
+        for img in images[:self.batch_size]:
+            n_pixels = img.shape[0] * img.shape[1]
+            color_distribution = []
+            for bounds in self.borders:
+                # mask = np.empty_like(img)
+                if bounds[0, 0] < 0:
+                    b = bounds.copy()
+                    b[0, 0] = 180 + b[0, 0]
+                    mask1 = cv2.inRange(img, b[0], np.array([179, b[1, 1], b[1, 2]])) / 255
+                    mask2 = cv2.inRange(img, np.array([0, b[0, 1], b[0, 2]]), b[1]) / 255
+                    mask = np.logical_or(mask1, mask2)
+                    del bounds
+                else:
+                    mask = cv2.inRange(img, bounds[0], bounds[1]) / 255
+
+                color_distribution.append(np.sum(mask) / n_pixels)
+            dominant_colors.append(np.argmax(np.array(color_distribution)))
+        return dominant_colors
+
+    def extract_color_features(self, v_id):
+        images = self.load_batch(v_id)
+        dominant_colors = []
+        saturation = []
+        lightness = []
+
+        for img in images[:self.batch_size]:
             n_pixels = img.shape[0] * img.shape[1]
             color_distribution = []
             for bounds in self.borders:
                 mask = cv2.inRange(img, bounds[0], bounds[1]) / 255  # TODO better intervals
                 color_distribution.append(np.sum(mask) / n_pixels)
             dominant_colors.append(np.argmax(np.array(color_distribution)))
-        return dominant_colors
 
     def load_batch(self, v_id: str) -> List[np.ndarray]:
         return [cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2HSV) for path in
@@ -48,10 +72,39 @@ class ColorDetector:
     def extract_v_ids(X: pd.DataFrame) -> List[str]:
         return X.v_id.tolist()
 
-    def __generate_intervals(self, n_intervals: int) -> List[Tuple[np.ndarray, np.ndarray]]:
-        stepsize = int(180 / n_intervals)
-        degree_bounds = list(range(0, 180, stepsize))
-        return [(np.array([i, 50, 50]), np.array([i + stepsize, 255, 255])) for i in degree_bounds]
+    def __generate_intervals(self, n_intervals: int, prefabs=True) -> np.ndarray:
+        if prefabs:
+            S_t = 20
+            V_t = 20
+
+            # Chosen via https://www.tydac.ch/color/
+            colors = {'red': ((-25, S_t, V_t), (20, 255, 255)),
+                      'orange': ((31, S_t, V_t), (45, 255, 255)),
+                      'yellow': ((45, S_t, V_t), (70, 255, 255)),
+                      'green': ((70, S_t, V_t), (146, 255, 255)),
+                      'cyan': ((146, S_t, V_t), (191, 255, 255)),
+                      'blue': ((191, S_t, V_t), (261, 255, 255)),
+                      'violet': ((261, S_t, V_t), (286, 255, 255)),
+                      'pink': ((286, S_t, V_t), (336, 255, 255)),
+                      'black': ((0, 0, 0), (359, 255, V_t)),
+                      'white': ((0, 0, V_t), (359, S_t, 255))
+                      }
+
+            borders = []
+            for color, bounds in colors.items():
+                lower = np.array(bounds[0])
+                lower[0] /= 1
+                upper = np.array(bounds[1])
+                upper[0] /= 1
+                borders.append(np.array([lower, upper]))
+
+            return borders
+
+
+        else:
+            stepsize = int(180 / n_intervals)
+            degree_bounds = list(range(0, 180, stepsize))
+        return np.array([(np.array([i, 50, 50]), np.array([i + stepsize, 255, 255])) for i in degree_bounds])
 
     def __return_most_frequent(self, row: pd.Series) -> int:
         return row.value_counts().idxmax()
