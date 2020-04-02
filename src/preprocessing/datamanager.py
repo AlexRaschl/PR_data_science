@@ -15,10 +15,10 @@ class DataManager:
 
     @staticmethod
     def load_tts_data(duration_ds=False, cnn_ds=True, color_ds=False, face_ds=False, cnn_agg=True,
-                      ohe_cnn=False, ohe_color=False, nlabels=None) -> Tuple[
+                      ohe_cnn=False, ohe_color=False, n_labels=None) -> Tuple[
         pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         if cnn_ds and ohe_cnn:
-            return load_train_test_split(feature_frame=True, one_hot_inputs=True, nlabels=nlabels)
+            return load_train_test_split(feature_frame=True, one_hot_inputs=True, nlabels=n_labels)
 
         # Set indizes for joins
         X_train, X_test, y_train, y_test = Indexer.load_split(INDEXED_TTS_PATH)
@@ -30,8 +30,8 @@ class DataManager:
         X_train.drop('n_samples', 1, inplace=True)
         X_test.drop('n_samples', 1, inplace=True)
         if not duration_ds:
-            X_train.drop('v_duration')
-            X_test.drop('v_duration')
+            X_train.drop('v_duration', 1, inplace=True)
+            X_test.drop('v_duration', 1, inplace=True)
 
         if color_ds:
             if ohe_color:
@@ -46,18 +46,27 @@ class DataManager:
                                                            os.path.join(STORED_FACE_PATH, 'train_faces.pkl'),
                                                            os.path.join(STORED_FACE_PATH, 'test_faces.pkl'))
         if cnn_ds:
-            X_train, X_test = DataManager.__load_and_merge(X_train, X_test,
-                                                           os.path.join(STORED_PRED_PATH,
-                                                                        f'train_cnn_agg_{cnn_agg}.pkl'),
-                                                           os.path.join(STORED_PRED_PATH,
-                                                                        f'test_cnn_agg_{cnn_agg}.pkl'))
+            if cnn_agg:
+                X_train, X_test = DataManager.__load_and_merge(X_train, X_test,
+                                                               os.path.join(STORED_PRED_PATH,
+                                                                            f'train_cnn_agg_{cnn_agg}.pkl'),
+                                                               os.path.join(STORED_PRED_PATH,
+                                                                            f'test_cnn_agg_{cnn_agg}.pkl'))
+            else:
+                CNN_train, CNN_test, _, _ = load_train_test_split(feature_frame=True, one_hot_inputs=False,
+                                                                  nlabels=n_labels)
+                X_train = DataManager.merge_df(X_train, CNN_train)
+                X_test = DataManager.merge_df(X_test, CNN_test)
 
         return X_train, X_test, y_train, y_test
 
     @staticmethod
     def __load_and_merge(X_train, X_test, path_train, path_test) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        addon_train = DataManager.load_from_file(path_train).set_index('v_id')
-        addon_test = DataManager.load_from_file(path_test).set_index('v_id')
+        addon_train = DataManager.load_from_file(path_train)
+        addon_test = DataManager.load_from_file(path_test)
+        if 'v_id' in addon_train.columns:
+            addon_train.set_index('v_id', inplace=True)
+            addon_test.set_index('v_id', inplace=True)
         return DataManager.merge_df(X_train, addon_train), DataManager.merge_df(X_test, addon_test)
 
     @staticmethod
