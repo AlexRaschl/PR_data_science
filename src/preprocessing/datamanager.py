@@ -1,6 +1,7 @@
 import os
 from typing import Dict, List, Tuple
 
+import numpy as np
 import pandas as pd
 
 from src.config import *
@@ -18,7 +19,7 @@ class DataManager:
                       ohe_cnn=False, ohe_color=False, n_labels=None) -> Tuple[
         pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         if cnn_ds and ohe_cnn:
-            return load_train_test_split(feature_frame=True, one_hot_inputs=True, nlabels=n_labels)
+            return load_train_test_split(feature_frame=True, one_hot_inputs=True, n_labels=n_labels)
 
         # Set indizes for joins
         X_train, X_test, y_train, y_test = Indexer.load_split(INDEXED_TTS_PATH)
@@ -68,6 +69,22 @@ class DataManager:
             addon_train.set_index('v_id', inplace=True)
             addon_test.set_index('v_id', inplace=True)
         return DataManager.merge_df(X_train, addon_train), DataManager.merge_df(X_test, addon_test)
+
+    @staticmethod
+    def log_tf(*varargs):
+        res = [df.apply(np.log, axis=1) if isinstance(df, pd.DataFrame) else np.log(df) for df in varargs]
+        if len(res) == 1:
+            return res[0]
+        else:
+            return res
+
+    @staticmethod
+    def inv_tf(*varargs):
+        res = [np.exp(df) for df in varargs]
+        if len(res) == 1:
+            return res[0]
+        else:
+            return res
 
     @staticmethod
     def merge_df(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
