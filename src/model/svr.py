@@ -1,25 +1,18 @@
-from sklearn.metrics import mean_absolute_error
 from sklearn.svm import SVR
 
-from src.model import cfw
+from src.model.utils import train_model
 
-X_train, X_test, y_train, y_test = cfw.load_train_test_split(dataset='CNN',
-                                                             feature_frame=True,
-                                                             n_labels=5)
+# TODO GS PARAMS
+params = {'degree': 10, 'kernel': 'linear', 'C': 2, 'epsilon': 0.05}  # Optimal GS params
+pp_dict = {'n_components': -1}
+data_dict = {'duration_ds': True,
+             'cnn_ds': False,
+             'color_ds': True,
+             'face_ds': True,
+             'cnn_agg': False,
+             'ohe_cnn': False,
+             'ohe_color': False,
+             'n_labels': None
+             }
 
-# svr = SVR(degree=10, kernel='poly', C=1, epsilon=0.05)
-
-# Using optimal params from Grid Search
-svr = SVR(degree=10, kernel='linear', C=2, epsilon=0.05)
-X_train, X_test, y_train, y_test = cfw.preprocess_data(X_train, X_test,
-                                                       y_train, y_test,
-                                                       n_components=0.95)
-
-y_train = y_train.iloc[:, 0].values
-y_test = y_test.iloc[:, 0].values
-
-svr.fit(X_train, y_train.ravel())
-
-y_pred = svr.predict(X_test)
-
-m_err = mean_absolute_error(y_test.ravel(), y_pred)
+pipeline, m_err = train_model(SVR(), params, data_dict, pp_dict, save_model=True)

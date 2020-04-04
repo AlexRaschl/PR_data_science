@@ -1,10 +1,11 @@
-from sklearn.ensemble import RandomForestRegressor
+from sklearn import ensemble
 
-from src.config import N_JOBS
 from src.model.utils import train_model
 
 # TODO GS PARAMS
-params = {'n_jobs': N_JOBS}
+params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 2,
+          'learning_rate': 0.01, 'loss': 'ls'}
+
 pp_dict = {'n_components': -1}
 data_dict = {'duration_ds': True,
              'cnn_ds': False,
@@ -16,4 +17,4 @@ data_dict = {'duration_ds': True,
              'n_labels': None
              }
 
-pipeline, m_err = train_model(RandomForestRegressor(), params, data_dict, pp_dict, save_model=True)
+pipeline, m_err = train_model(ensemble.GradientBoostingRegressor(), params, data_dict, pp_dict, save_model=True)

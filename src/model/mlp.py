@@ -1,31 +1,33 @@
-import numpy as np
-from sklearn.metrics import mean_absolute_error
 from sklearn.neural_network import MLPRegressor
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 
-from src.model import cfw
+from src.model.utils import train_model
+from src.preprocessing.datamanager import DataManager
 
-X_train, X_test, y_train, y_test = cfw.load_train_test_split(feature_frame=False, one_hot_inputs=False, n_labels=5)
-# cls = cfw.get_textual_description(X_test,  n_labels=1)
+X_train, X_test, y_train, y_test = DataManager.load_tts_data(duration_ds=True,
+                                                             cnn_ds=True,
+                                                             color_ds=True,
+                                                             face_ds=True,
+                                                             cnn_agg=True,
+                                                             ohe_cnn=False,
+                                                             ohe_color=True,
+                                                             n_labels=None)
 
+# TODO GS PARAMS
+params = {'hidden_layer_sizes': (100, 100, 50, 50, 10, 2), 'activation': 'tanh', 'solver': 'lbfgs',
+          'verbose': True,
+          'max_iter': 1_00,
+          'warm_start': True,
+          'learning_rate': 'adaptive',
+          'tol': 1e-5}
+pp_dict = {'n_components': 0.95, 'std_scale': True, 'with_mean': True}
+data_dict = {'duration_ds': True,
+             'cnn_ds': True,
+             'color_ds': True,
+             'face_ds': True,
+             'cnn_agg': True,
+             'ohe_cnn': False,
+             'ohe_color': True,
+             'n_labels': None
+             }
 
-X_train, X_test, y_train, y_test = cfw.load_train_test_split(feature_frame=True, one_hot_inputs=True, n_labels=5)
-
-mlp = make_pipeline(StandardScaler(with_mean=False),
-                    MLPRegressor(hidden_layer_sizes=(100, 50, 50, 25, 10), solver='lbfgs', verbose=True,
-                                 max_iter=1000))
-
-mlp.fit(X_train, y_train.iloc[:, 0].ravel())
-
-y_pred = mlp.predict(X_test)
-# y_pred = np.array([y_train.median() for i in range(len(y_pred))])
-
-
-print(f'Median of predictions: {np.median(y_pred)}')
-
-m_err = mean_absolute_error(y_test.iloc[:, 0].ravel(), y_pred.ravel())
-
-print(f'Mean absolute error: {m_err}')
-r2 = mlp.score(X_test, y_test.iloc[:, 0].ravel())
-print(f'R^2={r2}')
+pipeline, m_err = train_model(MLPRegressor(), params, data_dict, pp_dict, save_model=True)
