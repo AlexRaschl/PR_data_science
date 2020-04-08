@@ -6,8 +6,8 @@ from pprint import PrettyPrinter
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.model_selection import GridSearchCV
 
-from src.config import GRID_SEARCH_LOG_FOLDER, N_JOBS, SEARCH_METRICS, FILE_CREATION_MODE, SPLIT_SEED
-from src.model.cfw import load_train_test_split, preprocess_data
+from src.config import GRID_SEARCH_LOG_FOLDER, N_JOBS, SEARCH_METRICS, FILE_CREATION_MODE, SPLIT_SEED, N_FOLDS, PP_DICT
+from src.preprocessing.datamanager import DataManager
 
 
 def init_logger(log_name: str, level: str = 'INFO') -> logging.Logger:
@@ -47,11 +47,11 @@ def init_logger(log_name: str, level: str = 'INFO') -> logging.Logger:
     return logger
 
 
-def perform_grid_search(model, param_grid: dict, log_name: str,
-                        cv: int = 5,
+def perform_grid_search(model, param_grid: dict, data_dict: dict, pp_dict: dict = PP_DICT,
+                        log_name: str = 'log',
+                        cv: int = N_FOLDS,
                         seed: int = SPLIT_SEED,
-                        dataset: str = 'CNN',
-                        n_labels: int = 5, **kwargs):
+                        **kwargs):
     """
     Performs a Grid Search to find the best parameters based on n fold Cross Validation.
     It will perform an n-fold cross validation on all distinct parameterisations of the the given model passed via the
@@ -59,25 +59,25 @@ def perform_grid_search(model, param_grid: dict, log_name: str,
 
     @param model: Model for which the optimal hyperparameters need to be found.
     @param param_grid: Grid specifying the hyperparameter search space
+    @param data_dict: Configuration specifying what dataset the DataManager should load
+    @param pp_dict: Grid used to specify preprocessing steps (PCA, STD_SCALE, log_tf)
     @param log_name: Name of the logfile to write the outputs to
     @param cv: Number of folds
     @param seed: Train Test split seed to use
-    @param dataset: Features to be used, default uses CNN predictions
     @param n_labels: Number of frame classifications to load if feature includes CNN predictions
     @param kwargs: Parameters getting passed to the preprocess function
     """
 
-    X_train, X_test, y_train, y_test = preprocess_data(
-        *load_train_test_split(dataset, seed, feature_frame='CNN' in dataset, n_labels=n_labels, **kwargs),
-        n_components=kwargs.get('n_components', -1), std_scale=kwargs.get('std_scale', False))
-    general_args = {**kwargs, 'n_labels': n_labels, 'dataset': dataset, 'cv': cv, 'seed': seed}
+    X_train, X_test, y_train, y_test = DataManager.preprocess_data(*DataManager.load_tts_data(**data_dict),
+                                                                   pp_dict=pp_dict)
+    general_args = {**kwargs, 'data_dict': data_dict, 'pp_dict': pp_dict, 'cv': cv, 'seed': seed}
     logger = init_logger(log_name)
     logger.info('STARTING GRID SEARCH')
 
     for metric in SEARCH_METRICS:
         logger.info(f'OPTIMIZING FOR {metric}')
 
-        gscv = GridSearchCV(model, param_grid, cv=5, verbose=5,
+        gscv = GridSearchCV(model, param_grid, cv=cv, verbose=5,
                             scoring=metric, iid=True, n_jobs=N_JOBS)
 
         gscv.fit(X_train, y_train)
@@ -109,20 +109,18 @@ def write_report(gscv, model, logger, general_args: dict):
 def __test_best_param_setting(gscv: GridSearchCV, model, logger, general_args):
     logger.info('Detailed classification report:\n'
                 'Trained on full train set. Evaluated at full test set!')
-
-    ds = general_args.get('dataset')
-    seed = general_args.get('seed')
-    n_components = general_args.get('n_components', -1.0)
-    std_scale = general_args.get('std_scale', False)
-
-    X_train, X_test, y_train, y_test = preprocess_data(
-        *load_train_test_split(ds, seed, feature_frame='CNN' in ds), n_components, std_scale)
+    log_tf = general_args['pp_dict'].get('log_tf', False)
+    X_train, X_test, y_train, y_test = DataManager.preprocess_data(
+        *DataManager.load_tts_data(**general_args.get('data_dict')),
+        pp_dict=general_args['pp_dict'])
 
     # restore the original parameter dynamically
     # fit on that one to not use over-fitted grid-search
     model.set_params(**gscv.best_params_)
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
+    if log_tf:
+        y_test, predictions = DataManager.inv_tf(y_test, predictions)
     logger.info(
         'Regression Report:\n'
         f'Mean absolute error: {mean_absolute_error(y_test, predictions)}\n'

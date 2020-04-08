@@ -3,24 +3,24 @@ import numpy as np
 from sklearn.metrics import mean_absolute_error
 from sklearn.neighbors import KNeighborsRegressor
 
-from src.config import BL_KW
+from src.config import BL_DATA_DICT
 from src.model.utils import handle_savefig
 from src.preprocessing.datamanager import DataManager
 
 
-def compute_baseline(model, kw_load: dict = BL_KW, loss_function=mean_absolute_error, savefig=None, log_tf=True,
+def compute_baseline(model, kw_load: dict = BL_DATA_DICT, loss_function=mean_absolute_error, savefig=None, log_tf=True,
                      title='model'):
     X_train, X_test, y_train, y_test = DataManager.load_tts_data(**kw_load)
 
     if log_tf:
-        y_train = y_train.apply(np.log10)  # Log transform of response
+        y_train = DataManager.log_tf(y_train)  # Log transform of response
 
     model.fit(X_train, y_train.iloc[:, 0].ravel())
 
     y_pred = model.predict(X_test)
 
     if log_tf:
-        y_pred = 10 ** y_pred  # Transform prediction results back
+        y_pred = DataManager.inv_tf(y_pred)  # Transform prediction results back
 
     err = loss_function(y_test.iloc[:, 0].ravel(), y_pred.ravel())
 
@@ -99,7 +99,7 @@ class SimplePredictor:
 
 
 def compute_KNN1_baseline(savefig=['baseline', 'baseline_test_pred_comparison.png'], log_tf=True):
-    X_train, X_test, y_train, y_test = DataManager.load_tts_data(**BL_KW)
+    X_train, X_test, y_train, y_test = DataManager.load_tts_data(**BL_DATA_DICT)
 
     if log_tf:
         y_train = y_train.apply(np.log10)

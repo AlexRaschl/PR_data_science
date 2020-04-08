@@ -2,8 +2,7 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 from src.config import INDEXED_TTS_PATH, STORED_PRED_PATH, TRAIN_SIZE, TEST_SIZE, SPLIT_SEED
 from src.preprocessing.indexer import Indexer
@@ -92,16 +91,3 @@ def _check_shapes(train: pd.DataFrame, test: pd.DataFrame):
     if train.shape[0] != TRAIN_SIZE or test.shape[0] != TEST_SIZE:
         raise ValueError('Shapes do not match!')
 
-
-def preprocess_data(X_train, X_test, y_train, y_test, n_components=-1.0, std_scale: bool = False):
-    if std_scale:
-        std = StandardScaler().fit(X=X_train)
-        X_train = std.transform(X_train)
-        X_test = std.transform(X_test)
-
-    if n_components >= 0:
-        pca = PCA(n_components=n_components).fit(X_train)
-        X_train = pca.transform(X_train)
-        X_test = pca.transform(X_test)
-
-    return X_train, X_test, y_train, y_test

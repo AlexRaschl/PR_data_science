@@ -3,6 +3,8 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 from src.config import *
 from src.model.cfw import load_train_test_split
@@ -118,6 +120,23 @@ class DataManager:
         C_train = pd.concat([pd.get_dummies(C_train[col]) for col in C_train.columns], axis=1)
         C_test = pd.concat([pd.get_dummies(C_test[col]) for col in C_test.columns], axis=1)
         return DataManager.merge_df(X_train, C_train), DataManager.merge_df(X_test, C_test)
+
+    @staticmethod
+    def preprocess_data(X_train, X_test, y_train, y_test, pp_dict: dict = PP_DICT):
+        if pp_dict['std_scale']:
+            std = StandardScaler(with_mean=pp_dict.get('with_mean', True)).fit(X=X_train)
+            X_train = std.transform(X_train)
+            X_test = std.transform(X_test)
+
+        if pp_dict['n_components'] >= 0:
+            pca = PCA(n_components=pp_dict['n_components']).fit(X_train)
+            X_train = pca.transform(X_train)
+            X_test = pca.transform(X_test)
+
+        if pp_dict['log_tf']:
+            y_train, y_test = DataManager.log_tf(y_train, y_test)
+
+        return X_train, X_test, y_train, y_test
 
 
 if __name__ == '__main__':

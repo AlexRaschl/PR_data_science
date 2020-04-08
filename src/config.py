@@ -57,9 +57,27 @@ N_JOBS = int(multiprocessing.cpu_count() * (2 / 3))
 GRID_SEARCH_LOG_FOLDER = 'logs\\gscv'
 SEARCH_METRICS = ('neg_mean_absolute_error',)
 FILE_CREATION_MODE = 'w'
+N_FOLDS = 5
 
 # Visualization Path
 VIS_PATH = 'visualisations\\'
 
 # Face Cascade
 CASCADE_PATH = 'data/haarcascade_frontalface_default.xml'
+
+# Baseline kw
+BL_DATA_DICT = {'cnn_ds': True, 'cnn_agg': False, 'n_labels': 1, 'ohe_cnn': True}
+FULL_DATA_DICT = {'duration_ds': True,
+                  'cnn_ds': True,
+                  'color_ds': True,
+                  'face_ds': True,
+                  'cnn_agg': True,
+                  'ohe_cnn': False,
+                  'ohe_color': True,
+                  'n_labels': None
+                  }
+# Standard Preprocessing Dict
+PP_DICT = {'n_components': -1, 'std_scale': True, 'with_mean': True, 'log_tf': True}  # No PCA, Normalize with Mean
+
+# Model Storage
+STORED_MODEL_PATH = 'models'

@@ -1,18 +1,16 @@
 from sklearn.svm import SVR
 
-from src.model.utils import train_model
+from src.config import PP_DICT, FULL_DATA_DICT
+from src.model.utils import train_test_model
 
-# TODO GS PARAMS
-params = {'degree': 10, 'kernel': 'linear', 'C': 2, 'epsilon': 0.05}  # Optimal GS params
-pp_dict = {'n_components': -1}
-data_dict = {'duration_ds': True,
-             'cnn_ds': False,
-             'color_ds': True,
-             'face_ds': True,
-             'cnn_agg': False,
-             'ohe_cnn': False,
-             'ohe_color': False,
-             'n_labels': None
-             }
+# Optimal GS Params
+params = {'C': 1,
+          'epsilon': 0.01,
+          'kernel': 'rbf',
+          'shrinking': True,
+          'tol': 0.001}
 
-pipeline, m_err = train_model(SVR(), params, data_dict, pp_dict, save_model=True)
+pp_dict = PP_DICT
+data_dict = FULL_DATA_DICT
+
+pipeline, m_err, r2 = train_test_model(SVR(), params, data_dict, pp_dict, save_model=True)
