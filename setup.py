@@ -11,6 +11,11 @@ setuptools.setup(
         'src',
         'src/database',
         'src/extract',
+        'src/preprocessing',
+        'src/model',
+        'src/protocol',
+        'src/scraping',
+        'src/download'
     ],
     classifiers=[
         'Programming Language :: Python :: 3.7',
@@ -22,7 +27,9 @@ setuptools.setup(
         'tensorflow',
         'google-api-python-client',
         'scikit-image',
-        'scrapy'
-
+        'scrapy',
+        'seaborn',
+        'cv2',
+        'youtube_dl'
     ]
 )
