@@ -1,6 +1,6 @@
 import multiprocessing
 
-API_KEY = 'AIzaSyCj9-VpsoNOKui6MpJUPKPWTa8tnj1Mv98'
+API_KEY = 'INSERT'
 
 # DATA
 LFM_PATH = r'data/LFM-1b.txt'
