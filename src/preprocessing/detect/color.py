@@ -1,5 +1,4 @@
 import glob as glob
-import os
 from typing import List
 
 import cv2
@@ -8,29 +7,44 @@ import pandas as pd
 from natsort import natsorted
 from tqdm import tqdm
 
-from src.config import N_SAMPLES, INDEXED_TTS_PATH, STORED_COLOR_PATH
-from src.model.cfw import write_to_file
+from src.config import N_SAMPLES, INDEXED_TTS_PATH
 from src.preprocessing.datamanager import DataManager
 from src.preprocessing.indexer import Indexer
 
 
 class ColorDetector:
     def __init__(self, batch_size: int = N_SAMPLES, n_intervals: int = None):
+        self.use_presets = n_intervals is None
         self.batch_size = batch_size  #
         self.borders = (self.__generate_intervals(n_intervals, prefabs=n_intervals is None))
 
     def get_color_aggregates(self, X: pd.DataFrame) -> pd.DataFrame:
         v_ids = DataManager.extract_v_ids(X)
-        dominant_colors = np.array([self.detect_colors(v_id) for v_id in tqdm(v_ids)])
-        df = pd.DataFrame(dominant_colors, index=X.v_id)
-        df.columns = [f'frame_{i}' for i in range(self.batch_size)]
-        df['most_dominant'] = df.apply(lambda row: self.__return_most_frequent(row), axis=1)
+        distributions = np.array([self.detect_colors(v_id) for v_id in tqdm(v_ids)])
+        distributions /= distributions.sum(axis=1, keepdims=True)  # Normalizes rows to sum to 1
+        if self.use_presets:
+            df = pd.DataFrame(
+                {'v_id': v_ids,
+                 'red': distributions[:, 0],
+                 'orange': distributions[:, 1],
+                 'yellow': distributions[:, 2],
+                 'green': distributions[:, 3],
+                 'cyan': distributions[:, 4],
+                 'blue': distributions[:, 5],
+                 'violet': distributions[:, 6],
+                 'pink': distributions[:, 7],
+                 'black': distributions[:, 8],
+                 'white': distributions[:, 9],
+                 })
+            df.set_index('v_id', inplace=True)
+        else:
+            df = pd.DataFrame(distributions, index=X.v_id)
         df.reset_index(inplace=True)
         return df
 
-    def detect_colors(self, v_id: str) -> List[np.ndarray]:
+    def detect_colors(self, v_id: str) -> np.array:
         images = self.load_batch(v_id)
-        dominant_colors = []
+        distributions = []
         for img in images[:self.batch_size]:
             n_pixels = img.shape[0] * img.shape[1]
             color_distribution = []
@@ -47,8 +61,8 @@ class ColorDetector:
                     mask = cv2.inRange(img, bounds[0], bounds[1]) / 255
 
                 color_distribution.append(np.sum(mask) / n_pixels)
-            dominant_colors.append(np.argmax(np.array(color_distribution)))
-        return dominant_colors
+            distributions.append(color_distribution)
+        return np.sum(np.array(distributions), axis=0) / len(images)
 
     def extract_color_features(self, v_id):
         images = self.load_batch(v_id)
@@ -114,6 +128,6 @@ if __name__ == '__main__':
     cd = ColorDetector()
     X_train, X_test, _, _ = Indexer.load_split(folder_path=INDEXED_TTS_PATH)
     colors = cd.get_color_aggregates(X_train)
-    write_to_file(os.path.join(STORED_COLOR_PATH, 'train_colors.pkl'), colors)
+    # write_to_file(os.path.join(STORED_COLOR_PATH, 'train_colors.pkl'), colors)
     colors = cd.get_color_aggregates(X_test)
-    write_to_file(os.path.join(STORED_COLOR_PATH, 'test_colors.pkl'), colors)
+# write_to_file(os.path.join(STORED_COLOR_PATH, 'test_colors.pkl'), colors)
