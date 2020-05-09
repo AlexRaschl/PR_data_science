@@ -67,4 +67,4 @@ if __name__ == '__main__':
     face_frame = fd.get_face_counts(X_train)
     #  write_to_file(os.path.join(STORED_FACE_PATH, 'train_faces.pkl'), face_frame)
     face_frame = fd.get_face_counts(X_test)
-# write_to_file(os.path.join(STORED_FACE_PATH, 'test_faces.pkl'), face_frame)
+    # write_to_file(os.path.join(STORED_FACE_PATH, 'test_faces.pkl'), face_frame)

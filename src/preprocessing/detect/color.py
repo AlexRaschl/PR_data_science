@@ -1,4 +1,5 @@
 import glob as glob
+import os
 from typing import List
 
 import cv2
@@ -7,7 +8,8 @@ import pandas as pd
 from natsort import natsorted
 from tqdm import tqdm
 
-from src.config import N_SAMPLES, INDEXED_TTS_PATH
+from src.config import N_SAMPLES, INDEXED_TTS_PATH, STORED_COLOR_PATH
+from src.model.cfw import write_to_file
 from src.preprocessing.datamanager import DataManager
 from src.preprocessing.indexer import Indexer
 
@@ -128,6 +130,6 @@ if __name__ == '__main__':
     cd = ColorDetector()
     X_train, X_test, _, _ = Indexer.load_split(folder_path=INDEXED_TTS_PATH)
     colors = cd.get_color_aggregates(X_train)
-    # write_to_file(os.path.join(STORED_COLOR_PATH, 'train_colors.pkl'), colors)
+    write_to_file(os.path.join(STORED_COLOR_PATH, 'train_colors.pkl'), colors)
     colors = cd.get_color_aggregates(X_test)
-# write_to_file(os.path.join(STORED_COLOR_PATH, 'test_colors.pkl'), colors)
+    write_to_file(os.path.join(STORED_COLOR_PATH, 'test_colors.pkl'), colors)

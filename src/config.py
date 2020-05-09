@@ -73,7 +73,7 @@ FULL_DATA_DICT = {'duration_ds': True,
                   'face_ds': True,
                   'cnn_agg': True,
                   'ohe_cnn': False,
-                  'ohe_color': True,
+                  'ohe_color': False,
                   'n_labels': None
                   }
 # Standard Preprocessing Dict

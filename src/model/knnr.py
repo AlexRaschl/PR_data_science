@@ -3,7 +3,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from src.config import PP_DICT, FULL_DATA_DICT
 from src.model.utils import train_test_model
 
-params = {'n_neighbors': 21, 'p': 1, 'weights': 'distance'}
+params = {'n_neighbors': 41, 'p': 1, 'weights': 'distance'} #21
 pp_dict = PP_DICT
 data_dict = FULL_DATA_DICT
 
