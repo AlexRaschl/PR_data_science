@@ -9,7 +9,7 @@ from src.model.cv import cross_validation as gscv
 def grid_search_knn(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict = PP_DICT):
     param_grid = grid or [
         {
-            'n_neighbors': range(1, 50, 5),
+            'n_neighbors': range(1, 30, 5),
             'weights': ('uniform', 'distance'),
             'p': (2, 1, 1.5)
         }
@@ -61,4 +61,4 @@ if __name__ == '__main__':
         'ccp_alpha': (0.1,),
         'max_samples': (0.75,)
     }]
-    grid_search_knn()
+    grid_search_rf(grid=rf_grid)
