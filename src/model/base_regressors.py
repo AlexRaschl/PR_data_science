@@ -11,7 +11,7 @@ from src.model.utils import train_test_model, handle_savefig
 
 # TODO GS PARAMS
 params = {}
-pp_dict = {'n_components': -1, 'std_scale': True, 'with_mean': False, 'log_tf': True}
+pp_dict = {'n_components': -1, 'std_scale': True, 'with_mean': True, 'log_tf': True}
 data_dict = BL_DATA_DICT
 
 models = [KNeighborsRegressor(), SVR(), RandomForestRegressor(), MLPRegressor()]
