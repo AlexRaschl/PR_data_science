@@ -32,7 +32,9 @@ def train_test_model(model: BaseEstimator, param_dict, data_dict, pp_dict=PP_DIC
 
     pipeline = make_pipeline(*models)
 
-    pipeline.fit(X_train, (y_train if not log_tf else DataManager.log_tf(y_train)).iloc[:, 0])
+    y_tf = (y_train if not log_tf else DataManager.log_tf(y_train)).iloc[:, 0]
+
+    pipeline.fit(X_train, y_tf)
 
     m_err, r2 = compute_regression_result(pipeline, X_train, X_test, y_train, y_test, log_tf=log_tf)
 
