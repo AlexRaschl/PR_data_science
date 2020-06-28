@@ -19,14 +19,14 @@ def grid_search_knn(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict =
 
 def grid_search_svr(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict = PP_DICT):
     param_grid = grid or [
-        {
-            'kernel': ('poly',),
-            'C': (100, 1, 10),
-            'epsilon': (0.01, 0.1, 0.2, 0.5),
-            'shrinking': (True,),
-            'tol': (1e-3,),
-            'degree': (3, 9, 15)
-        },
+        # {
+        #     'kernel': ('poly',),
+        #     'C': (100, 1, 10),
+        #     'epsilon': (0.01, 0.1, 0.2, 0.5),
+        #     'shrinking': (True,),
+        #     'tol': (1e-3,),
+        #     'degree': (3, 9, 15)
+        # },
         {
             'kernel': ('rbf',),
             'C': (100, 1, 10),
@@ -53,12 +53,13 @@ def grid_search_rf(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict = 
 
 
 if __name__ == '__main__':
-    rf_grid = [{
-        'n_estimators': (10, 25, 100, 200),
-        'criterion': ('mse', 'mae'),
-        'max_depth': (15, 25),
-        'max_features': ('sqrt', 'auto'),
-        'ccp_alpha': (0.1,),
-        'max_samples': (0.75,)
-    }]
-    grid_search_rf(grid=rf_grid)
+    grid_search_svr()
+    # rf_grid = [{
+    #     'n_estimators': (10, 25, 100, 200),
+    #     'criterion': ('mse', 'mae'),
+    #     'max_depth': (15, 25),
+    #     'max_features': ('sqrt', 'auto'),
+    #     'ccp_alpha': (0.1,),
+    #     'max_samples': (0.75,)
+    # }]
+    # grid_search_rf(grid=rf_grid)
