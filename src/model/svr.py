@@ -5,7 +5,7 @@ from src.model.utils import train_test_model
 
 # Optimal GS Params
 params = {'C': 1,
-          'epsilon': 0.01,
+          'epsilon': 0.2,
           'kernel': 'rbf',
           'shrinking': True,
           'tol': 0.001}
