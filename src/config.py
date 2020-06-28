@@ -77,7 +77,7 @@ FULL_DATA_DICT = {'duration_ds': True,
                   'n_labels': None
                   }
 # Standard Preprocessing Dict
-PP_DICT = {'n_components': -1, 'std_scale': True, 'with_mean': True, 'log_tf': True}  # No PCA, Normalize with Mean
+PP_DICT = {'n_components': -1, 'std_scale': True, 'with_mean': False, 'log_tf': True}  # No PCA, Normalize without Mean
 
 # Model Storage
 STORED_MODEL_PATH = 'models'
