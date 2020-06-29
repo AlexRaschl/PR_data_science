@@ -39,27 +39,25 @@ def grid_search_svr(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict =
 
 
 def grid_search_rf(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict = PP_DICT):
-    param_grid = grid or [
-        {
-            'n_estimators': (10, 25, 100, 200),
-            'criterion': ('mse', 'mae'),
-            'max_depth': (None, 15, 25),
-            'max_features': ('sqrt', 'auto'),
-            'ccp_alpha': (0.0, 0.1),
-            'max_samples': (None, 0.75)
-        }
-    ]
+    param_grid = grid or [{
+        'n_estimators': (10, 25, 200),
+        'criterion': ('mse',),
+        'max_depth': (10, 25),
+        'max_features': ('auto',),
+        'ccp_alpha': (0.0, 0.1,),
+        'max_samples': (0.85, None)
+    }]
     gscv.perform_grid_search(RandomForestRegressor(), param_grid, data_dict, pp_dict, f'gs_rf.log')
 
 
 if __name__ == '__main__':
-    grid_search_svr()
-    # rf_grid = [{
-    #     'n_estimators': (10, 25, 100, 200),
-    #     'criterion': ('mse', 'mae'),
-    #     'max_depth': (15, 25),
-    #     'max_features': ('sqrt', 'auto'),
-    #     'ccp_alpha': (0.1,),
-    #     'max_samples': (0.75,)
-    # }]
-    # grid_search_rf(grid=rf_grid)
+    # grid_search_svr()
+    rf_grid = [{
+        'n_estimators': (10, 25, 200),
+        'criterion': ('mse',),
+        'max_depth': (10, 25),
+        'max_features': ('auto',),
+        'ccp_alpha': (0.0, 0.1,),
+        'max_samples': (0.85, None)
+    }]
+    grid_search_rf(grid=rf_grid)
