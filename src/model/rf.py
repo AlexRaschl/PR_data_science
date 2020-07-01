@@ -7,10 +7,10 @@ from src.model.utils import train_test_model
 params = {
     'n_jobs': N_JOBS,
     'criterion': 'mse',
-    'max_depth': 25,
+    'max_depth': 25,  # 25
     'max_features': 'auto',
     'n_estimators': 200,
-    'max_samples': 0.75,
+    'max_samples': 0.85,
     'ccp_alpha': 0.0
 }
 pp_dict = PP_DICT
