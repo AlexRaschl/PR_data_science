@@ -51,13 +51,7 @@ def grid_search_rf(grid=None, data_dict: dict = FULL_DATA_DICT, pp_dict: dict = 
 
 
 if __name__ == '__main__':
+    # grid_search_knn()
     # grid_search_svr()
-    rf_grid = [{
-        'n_estimators': (10, 25, 200),
-        'criterion': ('mse',),
-        'max_depth': (10, 25),
-        'max_features': ('auto',),
-        'ccp_alpha': (0.0, 0.1,),
-        'max_samples': (0.85, None)
-    }]
-    grid_search_rf(grid=rf_grid)
+    # grid_search_rf()
+    pass
