@@ -3,10 +3,11 @@ import os
 import time
 from pprint import PrettyPrinter
 
-from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, make_scorer
 from sklearn.model_selection import GridSearchCV
 
 from src.config import GRID_SEARCH_LOG_FOLDER, N_JOBS, SEARCH_METRICS, FILE_CREATION_MODE, SPLIT_SEED, N_FOLDS, PP_DICT
+from src.model.cfw import mean_absolute_percentage_error
 from src.preprocessing.datamanager import DataManager
 
 
@@ -125,3 +126,7 @@ def __test_best_param_setting(gscv: GridSearchCV, model, logger, general_args):
         'Regression Report:\n'
         f'Mean absolute error: {mean_absolute_error(y_test, predictions)}\n'
         f'Mean Squared error: {mean_squared_error(y_test, predictions)}')
+
+
+def __generate_scorer(score_func=mean_absolute_percentage_error):
+    return make_scorer(score_func, greater_is_better=False)
