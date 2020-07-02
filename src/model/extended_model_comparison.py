@@ -108,21 +108,44 @@ def compute_sorted_residual_plots_for_all(models_to_load, model_specs, save_path
         plot_sorted_residuals(model, data_dict=FULL_DATA_DICT, model_info=model_info, savefig=save_path)
 
 
-def compute_scores(model_path, X_test, y_test):
-    pipeline = ut.load_model(model_path)
-    y_pred = pipeline.predict(X_test)
+# def compute_scores(model_path, X_test, y_test):
+#     pipeline = ut.load_model(model_path)
+#     y_pred = pipeline.predict(X_test)
+#
+#     if check_log_tf(model_path):
+#         y_pred = DataManager.inv_tf(y_pred)
+#
+#     y_test_vec = np.array(y_test).ravel()
+#
+#     mae = mean_absolute_error(y_test_vec, y_pred)
+#     # mre = mean_relative_error(y_test_vec, y_pred)
+#     y_test_tf, y_pred_tf = DataManager.log_tf(y_test, y_pred)
+#     mape_tf = mean_absolute_percentage_error(y_test_tf, y_pred_tf)
+#     mape = mean_absolute_percentage_error(y_test_vec, y_pred)
+#     print(pipeline[-1].__class__.__name__, mape_tf, mape)
+#
+#     return pipeline[-1].__class__.__name__, mae, mape_tf, mape
 
+def compute_scores(model_path, X_test, y_test, log_tf=True):
+    pipeline = ut.load_model(model_path)
+    X_train, X_test, y_train, y_test = DataManager.load_tts_data(**FULL_DATA_DICT)
+    y_pred = pipeline.predict(X_test)
     if check_log_tf(model_path):
         y_pred = DataManager.inv_tf(y_pred)
 
-    y_test_vec = np.array(y_test).ravel()
+    y_test = np.array(y_test).ravel()
 
-    mae = mean_absolute_error(y_test_vec, y_pred)
-    # mre = mean_relative_error(y_test_vec, y_pred)
-    y_test_tf, y_pred_tf = DataManager.log_tf(y_test, y_pred)
-    mape_tf = mean_absolute_percentage_error(y_test_tf, y_pred_tf)
-    mape = mean_absolute_percentage_error(y_test_vec, y_pred)
+    sorted_idx = y_test.argsort()
+    y_test_srt = y_test[sorted_idx]
+    y_pred_srt = y_pred[sorted_idx]
 
+    if log_tf:
+        y_test_srt, y_pred_srt = DataManager.log_tf(y_test_srt, y_pred_srt)
+
+    mae = mean_absolute_error(y_test, y_pred)
+    mape_tf = mean_absolute_percentage_error(y_test_srt, y_pred_srt)
+    mape = mean_absolute_percentage_error(y_test, y_pred)
+    print(pipeline[-1].__class__.__name__, mape_tf, mape)
     return pipeline[-1].__class__.__name__, mae, mape_tf, mape
 
 
@@ -156,4 +179,4 @@ def error_summary(models_to_load, model_specs, save_path, ylimr, data_dict=FULL_
 
 
 error_summary(models_to_load, model_specs, save_path_overall, [0, 1000])
-compute_sorted_residual_plots_for_all(models_to_load, model_specs, save_paths_resid_comp)
+# compute_sorted_residual_plots_for_all(models_to_load, model_specs, save_paths_resid_comp)
